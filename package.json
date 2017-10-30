@@ -1,0 +1,29 @@
+{
+  "scripts": {
+    "eslint": "eslint . --max-warnings 0",
+    "prettier": "prettier \"**/*.{js,json,md}\"",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "eslint": "4.16.0",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-node": "5.2.1",
+    "eslint-plugin-prettier": "2.5.0",
+    "eslint-plugin-security": "1.4.0",
+    "jest": "22.1.4",
+    "jest-junit": "3.4.1",
+    "prettier": "1.10.2"
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    }
+  },
+  "workspaces": ["packages/*"],
+  "private": true
+}
