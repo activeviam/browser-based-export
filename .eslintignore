@@ -1,0 +1,4 @@
+node_modules
+
+# Lint .eslintrc.js file
+!.*.js

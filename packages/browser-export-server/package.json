@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "name": "@activeviam/browser-export-server",
+  "description": "Browser-export Server",
+  "version": "0.1.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node start"
+  },
+  "dependencies": {
+    "@activeviam/browser-export": "0.1.0",
+    "body-parser": "1.18.2",
+    "envalid": "4.1.2",
+    "express": "4.16.2",
+    "express-winston": "2.4.0",
+    "winston": "2.4.0"
+  },
+  "devDependencies": {
+    "request": "2.83.0",
+    "request-promise-native": "1.0.5"
+  },
+  "engines": {
+    "node": ">= 6.5.0",
+    "yarn": ">= 1.2.1"
+  }
+}
