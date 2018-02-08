@@ -7,6 +7,7 @@ const request = require('request-promise-native');
 const {createServer} = require('./server');
 
 const testEnvironment = {};
+const timeoutInSeconds = 7;
 
 beforeAll(() =>
   createServer({
@@ -19,8 +20,7 @@ beforeAll(() =>
       pdfExport: {
         // Authorize all URLs.
         authorizedUrlRegex: /localhost/,
-        // The test export should be quick.
-        timeoutInSeconds: 1,
+        timeoutInSeconds,
       },
     },
   }).then(({close, port}) => {
@@ -64,16 +64,26 @@ describe('/v1/pdf', () => {
       );
     }));
 
-  test('returns an error response when the URL is not authorized', () =>
-    exportPdf({url: 'https://bad.domain.com'}).then(response => {
+  test('returns an error response when the URL is not authorized', () => {
+    const url = 'https://bad.domain.com';
+    return exportPdf({url}).then(response => {
       expect(response.statusCode).toBe(500);
-      expect(response.body).toMatch(/The URL .+ is not authorized/);
-    }));
+      expect(response.body).toMatch(
+        // It's safe to disable the rule as we control the timeout value.
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        new RegExp(`The URL ${url} is not authorized\\.`)
+      );
+    });
+  });
 
   // Exports to PDF the routing information page of the server started in `beforeAll`.
-  test('returns a response with a PDF buffer body', () =>
-    exportPdf({url: testEnvironment.serverUrl}).then(response => {
-      expect(response.statusCode).toBe(200);
-      expect(response.headers['content-type']).toBe('application/pdf');
-    }));
+  test(
+    'returns a response with a PDF buffer body',
+    () =>
+      exportPdf({url: testEnvironment.serverUrl}).then(response => {
+        expect(response.statusCode).toBe(200);
+        expect(response.headers['content-type']).toBe('application/pdf');
+      }),
+    timeoutInSeconds * 1000
+  );
 });

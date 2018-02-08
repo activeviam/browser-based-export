@@ -1,14 +1,14 @@
 {
   "private": true,
-  "name": "@activeviam/browser-export-server",
-  "description": "Browser-export Server",
+  "name": "@activeviam/browser-based-export-server",
+  "description": "Browser-based Export Server",
   "version": "0.1.0",
   "main": "server.js",
   "scripts": {
     "start": "node start"
   },
   "dependencies": {
-    "@activeviam/browser-export": "0.1.0",
+    "@activeviam/browser-based-export": "0.1.0",
     "body-parser": "1.18.2",
     "envalid": "4.1.2",
     "express": "4.16.2",

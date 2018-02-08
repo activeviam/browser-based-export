@@ -1,4 +1,2 @@
-coverage
-node_modules
-reports
-packages/browser-export/artifacts/
+/coverage/
+node_modules/

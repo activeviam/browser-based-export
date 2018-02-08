@@ -10,13 +10,21 @@ jobs:
       - image: circleci/node:6.12-browsers
     steps:
       - checkout
+      - restore_cache:
+          key: root-node-modules-{{ checksum "yarn.lock" }}
       - run: yarn install
+      - save_cache:
+          key: root-node-modules-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
       - run: yarn run prettier --list-different
       - run: yarn run eslint
       - run:
-          command: yarn run test --coverage --testResultsProcessor="jest-junit"
+          # Use the `--silent` option to hide the `console.assert` calls done by Puppeteer.
+          # Otherwise, since https://github.com/facebook/jest/pull/5514, they would polute the console.
+          command: yarn run test --silent --coverage --testResultsProcessor=jest-junit
           environment:
-            JEST_JUNIT_OUTPUT: "reports/junit.xml"
+            JEST_JUNIT_OUTPUT: reports/junit.xml
       - store_test_results:
           path: reports
       - store_artifacts:
