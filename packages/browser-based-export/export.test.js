@@ -73,7 +73,7 @@ const getHtmlWithScript = cb => {
 describe('authentication', () => {
   // Relies on a control experiment to ensure the behaviour observed with the test
   // experiment is really a consequence of the options given to `exportPdf` and not a coincidence.
-  // We run the experiments in parallel to check that they run in parallel without stepping on each other.
+  // We run the experiments in parallel to check that they indeed run in isolated sessions.
   const testWithControlExperiment = ({
     appCallback,
     controlExperiment,
@@ -84,8 +84,7 @@ describe('authentication', () => {
         getPdfText({
           appCallback,
           exportOptions,
-          // The authentication options are really quick to apply so we can have a small timeout.
-          timeoutInSeconds: 1,
+          timeoutInSeconds: 7,
         }).then(check)
       )
     );
@@ -124,7 +123,7 @@ describe('authentication', () => {
     ['local', 'session'].forEach(type => {
       test(type, () => {
         const noItemText = 'noItemText';
-        const localStorageItem = {key: 'key', value: 'value'};
+        const webStorageItem = {key: 'key', value: 'value'};
 
         return testWithControlExperiment({
           appCallback(req, res) {
@@ -132,7 +131,7 @@ describe('authentication', () => {
               getHtmlWithScript(
                 rootId =>
                   `document.getElementById('${rootId}').innerHTML = ${type}Storage.getItem('${
-                    localStorageItem.key
+                    webStorageItem.key
                   }') || '${noItemText}';`
               )
             );
@@ -149,11 +148,11 @@ describe('authentication', () => {
           },
           testExperiment: {
             check(text) {
-              expect(text).toBe(localStorageItem.value);
+              expect(text).toBe(webStorageItem.value);
             },
             exportOptions: {
               authentication: {
-                webStorageItems: [Object.assign({type}, localStorageItem)],
+                webStorageItems: [Object.assign({type}, webStorageItem)],
               },
             },
           },
@@ -186,8 +185,7 @@ describe('waiting before triggering the export', () => {
       exportOptions: {
         // No custom options.
       },
-      // The control experiment should be quick.
-      timeoutInSeconds: 1,
+      timeoutInSeconds: 7,
     });
 
     return controlExperiment.then(controlText => {
@@ -297,7 +295,7 @@ describe('waiting before triggering the export', () => {
           // No custom options needed. This is a built-in behavior.
         },
       }),
-      jestTimeoutInMilliseconds: 10000,
+      jestTimeoutInMilliseconds: 30000,
       tolerance: 0.2,
     });
   });
@@ -338,7 +336,7 @@ describe('waiting before triggering the export', () => {
           },
         },
       }),
-      jestTimeoutInMilliseconds: 20000,
+      jestTimeoutInMilliseconds: 45000,
       // That's a big tolerance!
       // The behavior is the expected one, it's just Chromium taking its time...
       tolerance: 0.5,

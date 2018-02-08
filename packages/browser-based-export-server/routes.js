@@ -4,7 +4,7 @@ const {
   exportPdf,
   pdfExportExamplePayload,
   pdfExportPayloadSchema,
-} = require('@activeviam/browser-export');
+} = require('@activeviam/browser-based-export');
 const winston = require('winston');
 
 // We use declarative routing to provide living documentation for free.

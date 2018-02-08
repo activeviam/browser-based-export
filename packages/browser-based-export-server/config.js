@@ -35,7 +35,7 @@ const env = envalid.cleanEnv(
   {strict: true}
 );
 
-module.exports = {
+const config = {
   log: {
     colorize: env.COLOR,
     level: env.LOG_LEVEL,
@@ -51,3 +51,5 @@ module.exports = {
     },
   },
 };
+
+module.exports = config;

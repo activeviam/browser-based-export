@@ -19,8 +19,7 @@ beforeAll(() =>
       pdfExport: {
         // Authorize all URLs.
         authorizedUrlRegex: /localhost/,
-        // The test export should be quick.
-        timeoutInSeconds: 1,
+        timeoutInSeconds: 7,
       },
     },
   }).then(({close, port}) => {
