@@ -84,7 +84,12 @@ describe('authentication', () => {
         getPdfText({
           appCallback,
           exportOptions,
+<<<<<<< HEAD:packages/browser-based-export/export.test.js
           timeoutInSeconds: 7,
+=======
+          // The authentication options are really quick to apply so we can have a small timeout.
+          timeoutInSeconds: 5,
+>>>>>>> UI-1059 Fix resizing issue and add debug messages:packages/browser-based-export/export.test.js
         }).then(check)
       )
     );
