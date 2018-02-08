@@ -1,6 +1,6 @@
 # Goal
 
-`browser-export-server` is a Node.js server exposing an API to export a web application at a given URL to a PDF file.
+`browser-based-export-server` is a Node.js server exposing an API to export a web application at a given URL to a PDF file.
 
 # Usage
 

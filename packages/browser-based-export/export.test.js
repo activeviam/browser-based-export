@@ -41,7 +41,10 @@ const getPdf = ({appCallback, exportOptions, timeoutInSeconds}) =>
   withServer({
     appCallback,
     onReadyCallback: url =>
-      exportPdf(Object.assign({}, exportOptions, {url}), timeoutInSeconds),
+      exportPdf({
+        payload: Object.assign({}, exportOptions, {url}),
+        timeoutInSeconds,
+      }),
   });
 
 const getPdfText = options =>
@@ -71,9 +74,11 @@ const getHtmlWithScript = cb => {
 };
 
 describe('authentication', () => {
+  const timeoutInSeconds = 7;
+
   // Relies on a control experiment to ensure the behaviour observed with the test
   // experiment is really a consequence of the options given to `exportPdf` and not a coincidence.
-  // We run the experiments in parallel to check that they run in parallel without stepping on each other.
+  // We run the experiments in parallel to check that they indeed run in isolated sessions.
   const testWithControlExperiment = ({
     appCallback,
     controlExperiment,
@@ -84,81 +89,88 @@ describe('authentication', () => {
         getPdfText({
           appCallback,
           exportOptions,
-          // The authentication options are really quick to apply so we can have a small timeout.
-          timeoutInSeconds: 1,
+          timeoutInSeconds,
         }).then(check)
       )
     );
 
-  test('cookies can be added', () => {
-    const cookie = {name: 'name', value: 'value'};
+  test(
+    'cookies can be added',
+    () => {
+      const cookie = {name: 'name', value: 'value'};
 
-    return testWithControlExperiment({
-      appCallback(req, res) {
-        res.send(JSON.stringify(req.cookies));
-      },
-      controlExperiment: {
-        check(text) {
-          expect(JSON.parse(text)).toEqual({});
+      return testWithControlExperiment({
+        appCallback(req, res) {
+          res.send(JSON.stringify(req.cookies));
         },
-        exportOptions: {
-          authentication: {
-            // No cookies.
+        controlExperiment: {
+          check(text) {
+            expect(JSON.parse(text)).toEqual({});
+          },
+          exportOptions: {
+            authentication: {
+              // No cookies.
+            },
           },
         },
-      },
-      testExperiment: {
-        check(text) {
-          expect(JSON.parse(text)).toEqual({[cookie.name]: cookie.value});
-        },
-        exportOptions: {
-          authentication: {
-            cookies: [cookie],
+        testExperiment: {
+          check(text) {
+            expect(JSON.parse(text)).toEqual({[cookie.name]: cookie.value});
+          },
+          exportOptions: {
+            authentication: {
+              cookies: [cookie],
+            },
           },
         },
-      },
-    });
-  });
+      });
+    },
+    timeoutInSeconds * 1000
+  );
 
   describe('web storage items can be added', () => {
     ['local', 'session'].forEach(type => {
-      test(type, () => {
-        const noItemText = 'noItemText';
-        const localStorageItem = {key: 'key', value: 'value'};
+      test(
+        type,
+        () => {
+          const noItemText = 'noItemText';
+          const webStorageItem = {key: 'key', value: 'value'};
 
-        return testWithControlExperiment({
-          appCallback(req, res) {
-            res.send(
-              getHtmlWithScript(
-                rootId =>
-                  `document.getElementById('${rootId}').innerHTML = ${type}Storage.getItem('${
-                    localStorageItem.key
-                  }') || '${noItemText}';`
-              )
-            );
-          },
-          controlExperiment: {
-            check(text) {
-              expect(text).toBe(noItemText);
+          return testWithControlExperiment({
+            appCallback(req, res) {
+              res.send(
+                getHtmlWithScript(
+                  rootId =>
+                    `document.getElementById('${rootId}').innerHTML = ${type}Storage.getItem('${
+                      webStorageItem.key
+                    }') || '${noItemText}';`
+                )
+              );
             },
-            exportOptions: {
-              authentication: {
-                // Nothing to put in Web Storage.
+            controlExperiment: {
+              check(text) {
+                expect(text).toBe(noItemText);
+              },
+              exportOptions: {
+                authentication: {
+                  // Nothing to put in Web Storage.
+                },
               },
             },
-          },
-          testExperiment: {
-            check(text) {
-              expect(text).toBe(localStorageItem.value);
-            },
-            exportOptions: {
-              authentication: {
-                webStorageItems: [Object.assign({type}, localStorageItem)],
+            testExperiment: {
+              check(text) {
+                expect(text).toBe(webStorageItem.value);
+              },
+              exportOptions: {
+                authentication: {
+                  webStorageItems: [Object.assign({type}, webStorageItem)],
+                },
               },
             },
-          },
-        });
-      });
+          });
+        },
+        timeoutInSeconds * 1000
+      );
     });
   });
 });
@@ -178,6 +190,7 @@ describe('waiting before triggering the export', () => {
 
   const testEnvironment = {};
 
+  const controlExperimentTimeoutInSeconds = 7;
   beforeAll(() => {
     const controlExperiment = pTime(getPdfText)({
       appCallback(req, res) {
@@ -186,8 +199,7 @@ describe('waiting before triggering the export', () => {
       exportOptions: {
         // No custom options.
       },
-      // The control experiment should be quick.
-      timeoutInSeconds: 1,
+      timeoutInSeconds: controlExperimentTimeoutInSeconds,
     });
 
     return controlExperiment.then(controlText => {
@@ -196,7 +208,7 @@ describe('waiting before triggering the export', () => {
         controlExperimentDurationInMilliseconds: controlExperiment.time,
       });
     });
-  });
+  }, controlExperimentTimeoutInSeconds * 1000);
 
   const performTestExperiment = ({
     getExperimentOptions,
@@ -297,7 +309,7 @@ describe('waiting before triggering the export', () => {
           // No custom options needed. This is a built-in behavior.
         },
       }),
-      jestTimeoutInMilliseconds: 10000,
+      jestTimeoutInMilliseconds: 30000,
       tolerance: 0.2,
     });
   });
@@ -338,7 +350,7 @@ describe('waiting before triggering the export', () => {
           },
         },
       }),
-      jestTimeoutInMilliseconds: 20000,
+      jestTimeoutInMilliseconds: 45000,
       // That's a big tolerance!
       // The behavior is the expected one, it's just Chromium taking its time...
       tolerance: 0.5,
