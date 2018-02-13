@@ -35,7 +35,7 @@ const env = envalid.cleanEnv(
   {strict: true}
 );
 
-module.exports = {
+const config = {
   log: {
     colorize: env.COLOR,
     level: env.LOG_LEVEL,
@@ -44,10 +44,12 @@ module.exports = {
   routes: {
     pdfExport: {
       // We can safely disable the next warning as this is a variable
-      // Coming from the server environment and not a user input.
+      // coming from the server environment and not a user input.
       // eslint-disable-next-line security/detect-non-literal-regexp
       authorizedUrlRegex: new RegExp(env.PDF_EXPORT_AUTHORIZED_URL_PATTERN),
       timeoutInSeconds: env.PDF_EXPORT_TIMEOUT_IN_SECONDS,
     },
   },
 };
+
+module.exports = config;
