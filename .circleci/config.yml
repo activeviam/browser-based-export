@@ -28,3 +28,12 @@ jobs:
       - store_artifacts:
           path: coverage/lcov-report
           destination: coverage
+      - run:
+          command: yarn run bundle
+          working_directory: packages/browser-based-pdf-export-lambda
+      - run:
+          command: yarn run zip
+          working_directory: packages/browser-based-pdf-export-lambda
+      - store_artifacts:
+          path: packages/browser-based-pdf-export-lambda/dist.zip
+          destination: browser-based-pdf-export-lambda.zip

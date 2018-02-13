@@ -41,7 +41,10 @@ const getRoutes = config => {
               }
             })
             .then(() =>
-              exportPdf(body, config.pdfExport.timeoutInSeconds).then(pdf => {
+              exportPdf({
+                payload: body,
+                timeoutInSeconds: config.pdfExport.timeoutInSeconds,
+              }).then(pdf => {
                 res.setHeader('Content-disposition', 'attachment');
                 res.setHeader('Content-type', 'application/pdf');
                 res.send(pdf);
