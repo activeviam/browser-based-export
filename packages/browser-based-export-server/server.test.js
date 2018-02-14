@@ -59,7 +59,7 @@ describe('/v1/pdf', () => {
       url: testEnvironment.serverUrl,
     }).then(response => {
       expect(response.statusCode).toBe(500);
-      expect(response.body).toMatch(
+      expect(JSON.stringify(response.body)).toMatch(
         /should be equal to one of the allowed values/
       );
     }));
@@ -68,7 +68,7 @@ describe('/v1/pdf', () => {
     const url = 'https://bad.domain.com';
     return exportPdf({url}).then(response => {
       expect(response.statusCode).toBe(500);
-      expect(response.body).toMatch(
+      expect(JSON.stringify(response.body)).toMatch(
         // It's safe to disable the rule as we control the timeout value.
         // eslint-disable-next-line security/detect-non-literal-regexp
         new RegExp(`The URL ${url} is not authorized\\.`)
