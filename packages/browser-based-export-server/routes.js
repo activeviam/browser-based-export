@@ -7,6 +7,15 @@ const {
 } = require('@activeviam/browser-based-export');
 const winston = require('winston');
 
+const ensureJson = message => {
+  try {
+    JSON.parse(message);
+    return message;
+  } catch (error) {
+    return JSON.stringify({message});
+  }
+};
+
 // We use declarative routing to provide living documentation for free.
 const getRoutes = config => {
   const routes = {
@@ -52,7 +61,9 @@ const getRoutes = config => {
             )
             .catch(error => {
               winston.error(error);
-              res.status(500).json(error.message);
+              res.status(500);
+              res.set('Content-Type', 'application/json');
+              res.send(ensureJson(error.message));
             });
         },
         schema: pdfExportPayloadSchema,
