@@ -8,7 +8,7 @@ It also generates better looking PDF than Puppeteer by resizing the browser page
 ## Session isolation
 
 Every export happens in an isolated Chromium context.
-It means that the cookies, [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) items or any sensitive information will not be shared accross exports.
+It means that the cookies, [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) items or any sensitive information will not be shared across exports.
 Even if they are launched in parallel.
 
 ## Note
