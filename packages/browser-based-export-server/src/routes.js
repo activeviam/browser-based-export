@@ -52,6 +52,9 @@ const getRoutes = config => {
             .then(() =>
               exportPdf({
                 payload: body,
+                puppeteerOptions: {
+                  executablePath: config.pdfExport.chromiumExecutablePath,
+                },
                 timeoutInSeconds: config.pdfExport.timeoutInSeconds,
               }).then(pdf => {
                 res.setHeader('Content-disposition', 'attachment');

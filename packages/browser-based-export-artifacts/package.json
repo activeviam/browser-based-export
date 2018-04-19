@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "@activeviam/browser-based-export-artifacts",
+  "description":
+    "Build the archives to distribute the Browser-based export Server and Lambda",
+  "version": "0.1.0",
+  "devDependencies": {
+    "@activeviam/browser-based-export-server": "0.1.0",
+    "@activeviam/browser-based-pdf-export-lambda": "0.1.0",
+    "archiver": "2.1.1",
+    "fs-extra": "5.0.0"
+  },
+  "scripts": {
+    "build": "node scripts/build"
+  },
+  "engines": {
+    "node": ">= 6.5.0",
+    "yarn": ">= 1.2.1"
+  }
+}

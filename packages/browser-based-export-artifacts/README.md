@@ -1,6 +1,6 @@
 # Goal
 
-`browser-based-pdf-export-lambda` is a Node.js AWS Lambda to export a web application at a given URL to a PDF file.
+`browser-based-pdf-export-lambda` creates a .zip file deployable as a Node.js AWS Lambda to export a web application at a given URL to a PDF file.
 
 # Usage
 
@@ -8,7 +8,7 @@
 2.  Click on your Lambda tile in the "Designer" panel.
     Under the "Function code" section, change the "Code entry type" to "Upload a .zip file".
 3.  Upload the previously created .zip file.
-4.  Add the desired environment variables, configure the "Timeout" under the "Basic Settings" and increase the "Memory" to 1GB for instance.
+4.  Add the desired [environment variables](config.js), configure the "Timeout" under the "Basic Settings" and increase the "Memory" to 1GB for instance.
 5.  Add an "API Gateway" trigger under the "Designer" section.
 6.  Click on the "save" button on the upper right corner.
 7.  Click on the "API Gateway" tile in the "Designer" panel.

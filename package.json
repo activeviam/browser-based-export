@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "build": "oao run-script --tree build",
     "eslint": "eslint . --max-warnings 0",
     "prettier": "prettier \"**/*.{js,json,md}\"",
     "test": "jest"
@@ -12,6 +13,7 @@
     "eslint-plugin-security": "1.4.0",
     "jest": "22.4.2",
     "jest-junit": "3.6.0",
+    "oao": "1.5.1",
     "prettier": "1.11.0"
   },
   "jest": {

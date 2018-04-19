@@ -3,6 +3,9 @@
 const Ajv = require('ajv');
 const dedent = require('dedent');
 const escapeQuote = require('js-string-escape');
+const {
+  puppeteer: {chromium_revision: recommendedChromiumRevision},
+} = require('puppeteer/package');
 
 const {getRoundedDimensionsInPx} = require('./paper');
 const {pdfExportExamplePayload} = require('./examples');
@@ -269,7 +272,14 @@ const exportPdf = ({payload, puppeteerOptions, timeoutInSeconds}) => {
 };
 
 module.exports = {
+  /* eslint-disable no-undef */
+  devOnlyChromiumExecutablePath:
+    typeof DEV_ONLY_CHROMIUM_EXECUTABLE_PATH_DEFINED_BY_WEBPACK == 'undefined'
+      ? undefined
+      : DEV_ONLY_CHROMIUM_EXECUTABLE_PATH_DEFINED_BY_WEBPACK,
+  /* eslint-enable no-undef */
   exportPdf,
   pdfExportExamplePayload,
   pdfExportPayloadSchema,
+  recommendedChromiumRevision,
 };

@@ -3,21 +3,21 @@
   "name": "@activeviam/browser-based-export-server",
   "description": "Browser-based Export Server",
   "version": "0.1.0",
-  "main": "server.js",
   "scripts": {
-    "start": "node start"
+    "build": "webpack",
+    "start": "node src/start"
   },
-  "dependencies": {
+  "devDependencies": {
     "@activeviam/browser-based-export": "0.1.0",
     "body-parser": "1.18.2",
     "envalid": "4.1.2",
     "express": "4.16.2",
     "express-winston": "2.4.0",
-    "winston": "2.4.0"
-  },
-  "devDependencies": {
     "request": "2.83.0",
-    "request-promise-native": "1.0.5"
+    "request-promise-native": "1.0.5",
+    "webpack": "4.6.0",
+    "webpack-cli": "2.0.14",
+    "winston": "2.4.0"
   },
   "engines": {
     "node": ">= 6.5.0",
