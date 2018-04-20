@@ -4,6 +4,9 @@
 
 const request = require('request-promise-native');
 
+const {
+  devOnlyChromiumExecutablePath,
+} = require('@activeviam/browser-based-export');
 const {createServer} = require('./server');
 
 const testEnvironment = {};
@@ -20,6 +23,7 @@ beforeAll(() =>
       pdfExport: {
         // Authorize all URLs.
         authorizedUrlRegex: /localhost/,
+        chromiumExecutablePath: devOnlyChromiumExecutablePath,
         timeoutInSeconds,
       },
     },
@@ -81,6 +85,7 @@ describe('/v1/pdf', () => {
     'returns a response with a PDF buffer body',
     () =>
       exportPdf({url: testEnvironment.serverUrl}).then(response => {
+        expect(response.body).toBe('');
         expect(response.statusCode).toBe(200);
         expect(response.headers['content-type']).toBe('application/pdf');
       }),

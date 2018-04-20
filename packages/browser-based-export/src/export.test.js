@@ -8,7 +8,7 @@ const express = require('express');
 const pTime = require('p-time');
 const pdfText = require('pdf-text');
 
-const {exportPdf} = require('.');
+const {exportPdf} = require('./export');
 
 const withServer = ({appCallback, onReadyCallback}) => {
   const app = express();

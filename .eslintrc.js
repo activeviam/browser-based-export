@@ -32,6 +32,8 @@ module.exports = {
     'no-undefined': 'off',
     'no-underscore-dangle': 'off',
     'no-warning-comments': 'off',
+    // Doesn't work well with Yarn workspaces.
+    'node/no-unpublished-require': 'off',
     'one-var': 'off',
     // We can disable the following rule as the use of schemas
     // protects us from unexpected values.

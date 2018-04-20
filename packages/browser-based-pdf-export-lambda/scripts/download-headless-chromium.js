@@ -8,16 +8,13 @@ const fetch = require('node-fetch');
 const decompress = require('decompress');
 const decompressUnzip = require('decompress-unzip');
 
-const {directories: {lib: outputDirectory}} = require('../package');
-const packageDirectoryPath = path.dirname(require.resolve('../package'));
-
-const outputDirectoryPath = path.join(packageDirectoryPath, outputDirectory);
+const paths = require('../paths');
 
 const zipUrl =
   'https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-36/stable-headless-chromium-amazonlinux-2017-03.zip';
 
 fs
-  .pathExists(path.join(outputDirectoryPath, 'headless-chromium'))
+  .pathExists(path.join(paths.dist, paths.headlessChromiumFilename))
   .then(alreadyDownloaded => {
     if (alreadyDownloaded) {
       console.log('Headless Chromium has already been download.');
@@ -26,7 +23,7 @@ fs
       fetch(zipUrl)
         .then(response => response.buffer())
         .then(buffer =>
-          decompress(buffer, outputDirectoryPath, {
+          decompress(buffer, paths.dist, {
             plugins: [decompressUnzip()],
           })
         )

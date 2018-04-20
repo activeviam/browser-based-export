@@ -1,6 +1,9 @@
 /* eslint-env jest */
 'use strict';
 
+const {
+  devOnlyChromiumExecutablePath,
+} = require('@activeviam/browser-based-export');
 const express = require('express');
 const isBase64 = require('is-base64');
 
@@ -19,6 +22,9 @@ const callHandler = payload =>
       event: payload,
       log() {
         /* noop */
+      },
+      puppeteerOptions: {
+        executablePath: devOnlyChromiumExecutablePath,
       },
       timeoutInSeconds,
     });
@@ -80,6 +86,7 @@ describe('with running server', () => {
     'returns a response with a base64 encoded PDF body',
     () =>
       callHandler({url: testEnvironment.serverUrl}).then(response => {
+        expect(response.body).toBe('');
         expect(response.statusCode).toBe(200);
         expect(response.isBase64Encoded).toBe(true);
         expect(response.headers['content-type']).toBe('application/pdf');

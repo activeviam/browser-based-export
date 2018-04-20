@@ -1,11 +1,30 @@
 'use strict';
 
+const {
+  devOnlyChromiumExecutablePath,
+  recommendedChromiumRevision,
+} = require('@activeviam/browser-based-export');
 const envalid = require('envalid');
+
+const omitDevOnlyChromiumExecutablePath =
+  // eslint-disable-next-line no-undef
+  typeof OMIT_DEV_ONLY_CHROMIUM_EXECUTABLE_PATH_DEFINED_BY_BABEL !==
+  'undefined';
 
 const env = envalid.cleanEnv(
   // eslint-disable-next-line no-process-env
   process.env,
   {
+    CHROMIUM_EXECUTABLE_PATH: envalid.str(
+      Object.assign(
+        {
+          desc: `The path to the Chromium executable to launch to perform the export. The recommended revision is ${recommendedChromiumRevision}.`,
+        },
+        omitDevOnlyChromiumExecutablePath
+          ? {}
+          : {devDefault: devOnlyChromiumExecutablePath}
+      )
+    ),
     COLOR: envalid.bool({
       default: false,
       desc: 'If true, the log output will be colorized.',
@@ -47,6 +66,7 @@ const config = {
       // coming from the server environment and not a user input.
       // eslint-disable-next-line security/detect-non-literal-regexp
       authorizedUrlRegex: new RegExp(env.PDF_EXPORT_AUTHORIZED_URL_PATTERN),
+      chromiumExecutablePath: env.CHROMIUM_EXECUTABLE_PATH,
       timeoutInSeconds: env.PDF_EXPORT_TIMEOUT_IN_SECONDS,
     },
   },

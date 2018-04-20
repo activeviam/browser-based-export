@@ -3,6 +3,8 @@
 
 const path = require('path');
 
+const paths = require('../paths');
+
 const config = require('./config');
 const handle = require('./handle');
 
@@ -16,7 +18,7 @@ exports.handler = (event, context, callback) => {
     log: console.log.bind(console),
     puppeteerOptions: {
       args: ['--no-sandbox', '--single-process'],
-      executablePath: path.resolve('.', 'headless-chromium'),
+      executablePath: path.resolve('.', paths.headlessChromiumFilename),
     },
     // Read the timeout from the AWS Lambda function configuration.
     timeoutInSeconds: Math.ceil(context.getRemainingTimeInMillis() / 1000),

@@ -4,7 +4,7 @@ const globalDebug = require('debug');
 const promiseRetry = require('promise-retry');
 const puppeteer = require('puppeteer/node6/lib/Puppeteer');
 
-const {name: packageName} = require('./package');
+const {name: packageName} = require('../package');
 
 const namespacedDebug = action => globalDebug(`${packageName}:${action}`);
 
