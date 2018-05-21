@@ -17,7 +17,6 @@ module.exports = {
       // We need to redefine the `PROJECT_ROOT` constant because its value is computed dynamically in
       // puppeteer/lib/Downloader.js and thus Webpack cannot resolve some import paths statically.
       // See https://github.com/GoogleChrome/puppeteer/issues/1644.
-      // We cannot use something like `patch-package` here because it doesn't work well in yarn workspaces.
       {
         loader: StringReplacePlugin.replace({
           replacements: [
