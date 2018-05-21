@@ -49,30 +49,28 @@ test('returns an error response when the URL is not authorized', () => {
 describe('with running server', () => {
   const testEnvironment = {};
 
-  beforeAll(
-    () =>
-      new Promise(resolve => {
-        const app = express();
+  beforeAll(() =>
+    new Promise(resolve => {
+      const app = express();
 
-        app.get('/', (req, res) => {
-          res.send('Hello World!');
-        });
+      app.get('/', (req, res) => {
+        res.send('Hello World!');
+      });
 
-        const server = app.listen(0, () => {
-          Object.assign(testEnvironment, {
-            closeServer: () =>
-              new Promise((resolveClose, rejectClose) => {
-                server.close(
-                  closingError =>
-                    closingError ? rejectClose(closingError) : resolveClose()
-                );
-              }),
-            serverUrl: `http://localhost:${server.address().port}`,
-          });
-          resolve();
+      const server = app.listen(0, () => {
+        Object.assign(testEnvironment, {
+          closeServer: () =>
+            new Promise((resolveClose, rejectClose) => {
+              server.close(
+                closingError =>
+                  closingError ? rejectClose(closingError) : resolveClose()
+              );
+            }),
+          serverUrl: `http://localhost:${server.address().port}`,
         });
-      })
-  );
+        resolve();
+      });
+    }));
 
   afterAll(() => testEnvironment.closeServer());
 

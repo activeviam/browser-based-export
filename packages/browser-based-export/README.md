@@ -40,4 +40,4 @@ Here is an [example payload](examples.js).
 This package is using the [debug](https://www.npmjs.com/package/debug) utility.
 Set the `DEBUG` environment variable to `@activeviam/browser-based-export:*` to see the debug messages.
 
-If that's not enough, you can follow the [Puppeteer debugging tips](https://github.com/GoogleChrome/puppeteer/tree/v1.0.0#debugging-tips).
+If that's not enough, you can follow the [Puppeteer debugging tips](https://github.com/GoogleChrome/puppeteer/tree/v1.4.0#debugging-tips).

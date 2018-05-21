@@ -6,7 +6,9 @@ const path = require('path');
 const fs = require('fs-extra');
 const archiver = require('archiver');
 
-const {directories: {lib: outputDirectory}} = require('../package');
+const {
+  directories: {lib: outputDirectory},
+} = require('../package');
 const packageDirectoryPath = path.dirname(require.resolve('../package'));
 
 const outputDirectoryPath = path.join(packageDirectoryPath, outputDirectory);

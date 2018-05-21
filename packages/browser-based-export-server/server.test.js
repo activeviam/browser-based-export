@@ -28,8 +28,7 @@ beforeAll(() =>
       serverUrl: `http://localhost:${port}`,
       stopServer: close,
     });
-  })
-);
+  }));
 
 afterAll(() => testEnvironment.stopServer());
 

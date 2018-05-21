@@ -12,8 +12,9 @@ const packageDirectory = path.dirname(require.resolve('./package'));
 
 module.exports = {
   entry: path.join(packageDirectory, entryFilename),
+  mode: 'production',
   module: {
-    loaders: [
+    rules: [
       // We need to redefine the `PROJECT_ROOT` constant because its value is computed dynamically in
       // puppeteer/lib/Downloader.js and thus Webpack cannot resolve some import paths statically.
       // See https://github.com/GoogleChrome/puppeteer/issues/1644.

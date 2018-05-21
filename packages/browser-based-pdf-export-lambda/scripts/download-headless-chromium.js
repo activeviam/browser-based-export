@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 'use strict';
 
+const assert = require('assert');
 const path = require('path');
 
 const fs = require('fs-extra');
@@ -8,13 +9,23 @@ const fetch = require('node-fetch');
 const decompress = require('decompress');
 const decompressUnzip = require('decompress-unzip');
 
-const {directories: {lib: outputDirectory}} = require('../package');
+const {chromiumRevision} = require('@activeviam/browser-based-export');
+
+const {
+  directories: {lib: outputDirectory},
+} = require('../package');
 const packageDirectoryPath = path.dirname(require.resolve('../package'));
 
 const outputDirectoryPath = path.join(packageDirectoryPath, outputDirectory);
 
+assert.equal(
+  chromiumRevision,
+  '557152',
+  'The Chromium revision used by default by Puppeteer has changed. Please update the .zip URL below accordingly.'
+);
+
 const zipUrl =
-  'https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-36/stable-headless-chromium-amazonlinux-2017-03.zip';
+  'https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-44/dev-headless-chromium-amazonlinux-2017-03.zip';
 
 fs
   .pathExists(path.join(outputDirectoryPath, 'headless-chromium'))

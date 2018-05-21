@@ -5,17 +5,17 @@
   "main": "export.js",
   "devDependencies": {
     "cookie-parser": "1.4.3",
-    "express": "4.16.2",
+    "express": "4.16.3",
     "p-time": "1.0.0",
     "pdf-text": "0.4.0"
   },
   "dependencies": {
-    "ajv": "6.0.1",
+    "ajv": "6.5.0",
     "debug": "3.1.0",
     "dedent": "0.7.0",
     "js-string-escape": "1.0.1",
     "promise-retry": "1.1.1",
-    "puppeteer": "1.0.0"
+    "puppeteer": "1.4.0-next.1526593919447"
   },
   "engines": {
     "node": ">= 8.10.0",

@@ -3,6 +3,9 @@
 const Ajv = require('ajv');
 const dedent = require('dedent');
 const escapeQuote = require('js-string-escape');
+const {
+  puppeteer: {chromium_revision: chromiumRevision},
+} = require('puppeteer/package');
 
 const {getRoundedDimensionsInPx} = require('./paper');
 const {pdfExportExamplePayload} = require('./examples');
@@ -269,6 +272,7 @@ const exportPdf = ({payload, puppeteerOptions, timeoutInSeconds}) => {
 };
 
 module.exports = {
+  chromiumRevision,
   exportPdf,
   pdfExportExamplePayload,
   pdfExportPayloadSchema,

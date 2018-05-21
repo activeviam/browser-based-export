@@ -19,9 +19,7 @@ jobs:
       - run: yarn run prettier --list-different
       - run: yarn run eslint
       - run:
-          # Use the `--silent` option to hide the `console.assert` calls done by Puppeteer.
-          # Otherwise, since https://github.com/facebook/jest/pull/5514, they would polute the console.
-          command: yarn run test --silent --coverage --testResultsProcessor=jest-junit
+          command: yarn run test --coverage --testResultsProcessor=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: reports/junit.xml
       - store_test_results:
