@@ -23,8 +23,8 @@
     "lib": "dist"
   },
   "engines": {
-    "node": ">= 6.5.0",
-    "yarn": ">= 1.2.1"
+    "node": ">= 8.10.0",
+    "yarn": ">= 1.5.1"
   },
   "files": ["dist/"],
   "scripts": {

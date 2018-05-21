@@ -1,6 +1,6 @@
 'use strict';
 
-const {PaperFormats} = require('puppeteer/node6/lib/Page');
+const {PaperFormats} = require('puppeteer/lib/Page');
 
 // Taken from Puppeteer's Page module not-exported constant.
 const unitToPixels = {

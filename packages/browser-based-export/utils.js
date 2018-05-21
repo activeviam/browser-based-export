@@ -2,7 +2,7 @@
 
 const globalDebug = require('debug');
 const promiseRetry = require('promise-retry');
-const puppeteer = require('puppeteer/node6/lib/Puppeteer');
+const puppeteer = require('puppeteer/lib/Puppeteer');
 
 const {name: packageName} = require('./package');
 

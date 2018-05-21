@@ -10,7 +10,7 @@ To create the deployable .zip file, run the following command: `yarn install && 
 
 ## Deployment
 
-1.  Create a Node.js AWS Lambda function "from scratch".
+1.  Create a Node.js AWS Lambda function "from scratch" with the "Node.js 8.10" runtime.
 2.  Click on your Lambda tile in the "Designer" panel.
     Under the "Function code" section, change the "Code entry type" to "Upload a .zip file".
 3.  Upload the previously created .zip file.

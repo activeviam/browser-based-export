@@ -2,12 +2,11 @@ version: 2
 jobs:
   build:
     docker:
-      # Closest available image to 6.5.0 which is the version of Node.js on Azure functions.
+      # Closest available image to 8.10.0 which is the AWS Lambda runtime we target.
       # We use the image with browsers included to be able to use Chromium.
       # See https://hub.docker.com/r/circleci/node/tags/
-      # See https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-node#node-version-and-package-management
       # See https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html
-      - image: circleci/node:6.12-browsers
+      - image: circleci/node:8.11-browsers
     steps:
       - checkout
       - restore_cache:
