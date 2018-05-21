@@ -29,7 +29,7 @@
   "files": ["dist/"],
   "scripts": {
     "postinstall": "node scripts/download-headless-chromium",
-    "bundle": "webpack",
+    "build": "webpack && yarn run zip",
     "zip": "node scripts/zip"
   }
 }

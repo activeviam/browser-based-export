@@ -6,7 +6,7 @@
 
 ## Build
 
-To create the deployable .zip file, run the following command: `yarn install && yarn run bundle && yarn run zip`.
+To create the deployable .zip file, run the following command: `yarn install && yarn run build`.
 
 ## Deployment
 
