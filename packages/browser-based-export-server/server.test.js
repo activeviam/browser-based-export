@@ -4,33 +4,40 @@
 
 const request = require('request-promise-native');
 
-const {createServer} = require('./server');
+const {withServer} = require('./server');
 
 const testEnvironment = {};
-const timeoutInSeconds = 7;
+const timeoutInSeconds = 3;
 
 beforeAll(() =>
-  createServer({
-    log: {
-      // Use critical logging level as we are going to test error cases and
-      // we don't want them to pollute the console.
-      level: 'crit',
-    },
-    routes: {
-      pdfExport: {
-        // Authorize all URLs.
-        authorizedUrlRegex: /localhost/,
-        timeoutInSeconds,
+  new Promise(resolve =>
+    withServer({
+      action: ({port}) =>
+        new Promise(resolveAction => {
+          Object.assign(testEnvironment, {
+            resolve: resolveAction,
+            serverUrl: `http://localhost:${port}`,
+          });
+          resolve();
+        }),
+      config: {
+        log: {
+          // Use critical logging level as we are going to test error cases and
+          // we don't want them to pollute the console.
+          level: 'crit',
+        },
+        routes: {
+          pdfExport: {
+            // Authorize all URLs.
+            authorizedUrlRegex: /localhost/,
+            timeoutInSeconds,
+          },
+        },
       },
-    },
-  }).then(({close, port}) => {
-    Object.assign(testEnvironment, {
-      serverUrl: `http://localhost:${port}`,
-      stopServer: close,
-    });
-  }));
+    })
+  ));
 
-afterAll(() => testEnvironment.stopServer());
+afterAll(() => testEnvironment.resolve());
 
 const getRequestOptions = (path, payload) => ({
   body: payload,

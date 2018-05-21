@@ -1,6 +1,6 @@
 'use strict';
 
-const {exportPdf} = require('@activeviam/browser-based-export');
+const {inBrowser} = require('@activeviam/browser-based-export');
 
 const handle = ({
   callback,
@@ -33,24 +33,27 @@ const handle = ({
         throw new Error(`The URL ${url} is not authorized.`);
       }
 
-      return exportPdf({
-        payload,
+      return inBrowser({
+        action: ({exportPdf}) =>
+          exportPdf({
+            payload,
+            timeoutInSeconds,
+          }).then(pdf => {
+            callback(null, {
+              // The body must be a string so we have to serialize the PDF buffer.
+              body: pdf.toString('base64'),
+              headers: {
+                'content-disposition': 'attachment',
+                'content-type': 'application/pdf',
+              },
+              // This flag is used to tell the API Gateway to convert the base64 string back to binary.
+              // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html.
+              // And https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html.
+              isBase64Encoded: true,
+              statusCode: 200,
+            });
+          }),
         puppeteerOptions,
-        timeoutInSeconds,
-      }).then(pdf => {
-        callback(null, {
-          // The body must be a string so we have to serialize the PDF buffer.
-          body: pdf.toString('base64'),
-          headers: {
-            'content-disposition': 'attachment',
-            'content-type': 'application/pdf',
-          },
-          // This flag is used to tell the API Gateway to convert the base64 string back to binary.
-          // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html.
-          // And https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html.
-          isBase64Encoded: true,
-          statusCode: 200,
-        });
       });
     })
     .catch(error => {

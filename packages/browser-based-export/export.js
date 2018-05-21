@@ -12,7 +12,7 @@ const {pdfExportExamplePayload} = require('./examples');
 const {pdfExportPayloadSchema} = require('./schemas');
 const {
   executeAsyncAction,
-  inIsolatedSession,
+  inBrowser: inAgnosticBrowser,
   namespacedDebug,
   rejectAfterTimeout,
   waitForEvaluationContext,
@@ -211,7 +211,7 @@ const generatePdf = ({dimensions, page}) =>
     name: 'PDF generation',
   });
 
-const exportPdf = ({payload, puppeteerOptions, timeoutInSeconds}) => {
+const exportPdf = ({inIncognitoContext, payload, timeoutInSeconds}) => {
   if (!validate(payload)) {
     throw new Error(JSON.stringify(validate.errors, null, 2));
   }
@@ -229,41 +229,39 @@ const exportPdf = ({payload, puppeteerOptions, timeoutInSeconds}) => {
     action: () =>
       rejectAfterTimeout({
         errorMessage: `Failed to perform the export under the given timeout of ${timeoutInSeconds} seconds.`,
-        promise: inIsolatedSession({
-          action: page =>
-            authenticate({
-              authentication: payload.authentication,
-              page,
-              timeoutInMilliseconds,
-              url: payload.url,
-            })
-              .then(() =>
-                Promise.all([
-                  gotoPage({page, url: payload.url}),
-                  waitForEvaluationContext({
-                    page,
-                    timeoutInMilliseconds,
-                  })
-                    .then(() =>
-                      waitUntilReadyStateComplete({page, timeoutInMilliseconds})
-                    )
-                    .then(() =>
-                      Promise.all([
-                        resize({dimensions, page}),
-                        waitUntilRenderComplete({page, timeoutInMilliseconds}),
-                      ])
-                    ),
-                  waitUntilNetworkIdle({
-                    page,
-                    timeoutInMilliseconds,
-                    waitUntil: payload.waitUntil,
-                  }),
-                ])
-              )
-              .then(() => waitForIdleBrowser({page}))
-              .then(() => generatePdf({dimensions, page})),
-          puppeteerOptions,
-        }),
+        promise: inIncognitoContext(page =>
+          authenticate({
+            authentication: payload.authentication,
+            page,
+            timeoutInMilliseconds,
+            url: payload.url,
+          })
+            .then(() =>
+              Promise.all([
+                gotoPage({page, url: payload.url}),
+                waitForEvaluationContext({
+                  page,
+                  timeoutInMilliseconds,
+                })
+                  .then(() =>
+                    waitUntilReadyStateComplete({page, timeoutInMilliseconds})
+                  )
+                  .then(() =>
+                    Promise.all([
+                      resize({dimensions, page}),
+                      waitUntilRenderComplete({page, timeoutInMilliseconds}),
+                    ])
+                  ),
+                waitUntilNetworkIdle({
+                  page,
+                  timeoutInMilliseconds,
+                  waitUntil: payload.waitUntil,
+                }),
+              ])
+            )
+            .then(() => waitForIdleBrowser({page}))
+            .then(() => generatePdf({dimensions, page}))
+        ),
         timeoutInMilliseconds,
       }),
     debug: namespacedDebug('exportPdf'),
@@ -271,9 +269,21 @@ const exportPdf = ({payload, puppeteerOptions, timeoutInSeconds}) => {
   });
 };
 
+const inBrowser = ({action, puppeteerOptions}) =>
+  inAgnosticBrowser({
+    action: inIncognitoContext =>
+      Promise.resolve().then(() =>
+        action({
+          exportPdf: ({payload, timeoutInSeconds}) =>
+            exportPdf({inIncognitoContext, payload, timeoutInSeconds}),
+        })
+      ),
+    puppeteerOptions,
+  });
+
 module.exports = {
   chromiumRevision,
-  exportPdf,
+  inBrowser,
   pdfExportExamplePayload,
   pdfExportPayloadSchema,
 };

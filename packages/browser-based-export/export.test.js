@@ -5,10 +5,26 @@
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
+const pFinally = require('p-finally');
 const pTime = require('p-time');
 const pdfText = require('pdf-text');
 
-const {exportPdf} = require('.');
+const {inBrowser} = require('.');
+
+const testEnvironment = {};
+
+beforeAll(() =>
+  new Promise(resolve =>
+    inBrowser({
+      action: ({exportPdf}) =>
+        new Promise(resolveAction => {
+          Object.assign(testEnvironment, {exportPdf, resolve: resolveAction});
+          resolve();
+        }),
+    })
+  ));
+
+afterAll(() => testEnvironment.resolve());
 
 const withServer = ({appCallback, onReadyCallback}) => {
   const app = express();
@@ -20,18 +36,25 @@ const withServer = ({appCallback, onReadyCallback}) => {
     const server = app.listen(
       // Let the OS pick an available port so that we can have several servers running in parallel.
       0,
-      () => {
+      error => {
+        if (error) {
+          reject(error);
+        }
+
         const serverUrl = `http://localhost:${server.address().port}`;
-        onReadyCallback(serverUrl).then(
-          result =>
-            server.close(() => {
-              resolve(result);
-            }),
-          error =>
-            server.close(() => {
-              reject(error);
+        pFinally(
+          onReadyCallback(serverUrl),
+          () =>
+            new Promise((resolveClose, rejectClose) => {
+              server.close(closeError => {
+                if (closeError) {
+                  rejectClose(closeError);
+                } else {
+                  resolveClose();
+                }
+              });
             })
-        );
+        ).then(resolve, reject);
       }
     );
   });
@@ -41,7 +64,7 @@ const getPdf = ({appCallback, exportOptions, timeoutInSeconds}) =>
   withServer({
     appCallback,
     onReadyCallback: url =>
-      exportPdf({
+      testEnvironment.exportPdf({
         payload: Object.assign({}, exportOptions, {url}),
         timeoutInSeconds,
       }),
@@ -78,7 +101,7 @@ describe('authentication', () => {
 
   // Relies on a control experiment to ensure the behaviour observed with the test
   // experiment is really a consequence of the options given to `exportPdf` and not a coincidence.
-  // We run the experiments in parallel to check that they indeed run in isolated sessions.
+  // We run the experiments in parallel to check that they indeed run in isolated incognito context.
   const testWithControlExperiment = ({
     appCallback,
     controlExperiment,
@@ -178,8 +201,7 @@ describe('authentication', () => {
 describe('waiting before triggering the export', () => {
   const responseText = 'control-text';
 
-  // An order of magnitude should be enough to measure
-  // the timing with an acceptable accuracy.
+  // An order of magnitude should be enough to measure the timing with an acceptable accuracy.
   const getMillisecondsDelayFromControlExperiment = controlExperimentDuration =>
     10 * controlExperimentDuration;
 
@@ -188,9 +210,9 @@ describe('waiting before triggering the export', () => {
     expect(actual).toBeLessThanOrEqual(expected * (1 + tolerance));
   };
 
-  const testEnvironment = {};
+  const waitingTestEnvironment = {};
 
-  const controlExperimentTimeoutInSeconds = 7;
+  const controlExperimentTimeoutInSeconds = 3;
   beforeAll(() => {
     const controlExperiment = pTime(getPdfText)({
       appCallback(req, res) {
@@ -204,7 +226,7 @@ describe('waiting before triggering the export', () => {
 
     return controlExperiment.then(controlText => {
       expect(controlText).toBe(responseText);
-      Object.assign(testEnvironment, {
+      Object.assign(waitingTestEnvironment, {
         controlExperimentDurationInMilliseconds: controlExperiment.time,
       });
     });
@@ -216,13 +238,13 @@ describe('waiting before triggering the export', () => {
       testExperimentDurationInMilliseconds,
     }) =>
       testExperimentDurationInMilliseconds -
-      testEnvironment.controlExperimentDurationInMilliseconds,
+      waitingTestEnvironment.controlExperimentDurationInMilliseconds,
     jestTimeoutInMilliseconds,
     tolerance,
   }) => {
     const getDelaysAndExperimentOptions = () => {
       const delayToWaitForInMilliseconds = getMillisecondsDelayFromControlExperiment(
-        testEnvironment.controlExperimentDurationInMilliseconds
+        waitingTestEnvironment.controlExperimentDurationInMilliseconds
       );
       return {
         delayToWaitForInMilliseconds,
@@ -309,7 +331,7 @@ describe('waiting before triggering the export', () => {
           // No custom options needed. This is a built-in behavior.
         },
       }),
-      jestTimeoutInMilliseconds: 30000,
+      jestTimeoutInMilliseconds: 10000,
       tolerance: 0.2,
     });
   });
@@ -321,7 +343,7 @@ describe('waiting before triggering the export', () => {
         testExperimentDurationInMilliseconds,
       }) =>
         testExperimentDurationInMilliseconds -
-        testEnvironment.controlExperimentDurationInMilliseconds -
+        waitingTestEnvironment.controlExperimentDurationInMilliseconds -
         // We only want to count the delay incurred by the `fetch` call,
         // not the one that happened when Chromium loaded the page in the first time.
         delayToWaitForInMilliseconds -
@@ -350,10 +372,10 @@ describe('waiting before triggering the export', () => {
           },
         },
       }),
-      jestTimeoutInMilliseconds: 45000,
+      jestTimeoutInMilliseconds: 10000,
       // That's a big tolerance!
       // The behavior is the expected one, it's just Chromium taking its time...
-      tolerance: 0.5,
+      tolerance: 0.6,
     });
   });
 });

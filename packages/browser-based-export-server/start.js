@@ -1,6 +1,6 @@
 'use strict';
 
 const config = require('./config');
-const {createServer} = require('./server');
+const {withServer} = require('./server');
 
-createServer(config);
+withServer({config});

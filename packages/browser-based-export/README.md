@@ -5,9 +5,9 @@
 It can handle authentication by injecting cookies or _localStorage_ items into Headless Chromium.
 It also generates better looking PDF than Puppeteer by resizing the browser page to the paper format before triggering the PDF export.
 
-## Session isolation
+## Export isolation
 
-Every export happens in an isolated Chromium context.
+Every export happens in an isolated incognito Chromium context.
 It means that the cookies, [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) items or any sensitive information will not be shared across exports.
 Even if they are launched in parallel.
 
@@ -21,15 +21,19 @@ Thus, any feature or option that would couple it to ActiveUI (for instance) does
 ## Example
 
 ```javascript
-const {exportPdf} = require('@activeviam/browser-based-export');
+const {inBrowser} = require('@activeviam/browser-based-export');
 
-exportPdf({
-  payload: {
-    /* */
-  },
-  timeoutInSeconds: 10,
-}).then(pdfBuffer => {
-  // Do something with it.
+// Start Headless Chromium and automatically close it when the passed callback resolves.
+inBrowser({
+  action: ({exportPdf) =>
+    exportPdf({
+      payload: {
+        /* */
+      },
+      timeoutInSeconds: 10,
+    }).then(pdfBuffer => {
+      // Do something with it.
+    }),
 });
 ```
 

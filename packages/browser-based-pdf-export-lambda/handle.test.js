@@ -6,7 +6,7 @@ const isBase64 = require('is-base64');
 
 const handle = require('./handle');
 
-const timeoutInSeconds = 7;
+const timeoutInSeconds = 3;
 
 const callHandler = payload =>
   new Promise(resolve => {

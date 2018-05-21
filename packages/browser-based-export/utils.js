@@ -1,6 +1,7 @@
 'use strict';
 
 const globalDebug = require('debug');
+const pFinally = require('p-finally');
 const promiseRetry = require('promise-retry');
 const puppeteer = require('puppeteer/lib/Puppeteer');
 
@@ -25,35 +26,60 @@ const executeAsyncAction = ({action, debug, name}) =>
       }
     );
 
-const inIsolatedSession = ({action, puppeteerOptions}) => {
-  const debug = namespacedDebug('inIsolatedSession');
+const inIncognitoContext = ({action, browser}) => {
+  const debug = namespacedDebug('inIncognitoContext');
 
-  const close = browser =>
+  return executeAsyncAction({
+    action: () => browser.createIncognitoBrowserContext(),
+    debug,
+    name: 'creating incognito context',
+  }).then(context =>
     executeAsyncAction({
-      action: browser.close.bind(browser),
+      action: () => context.newPage(),
       debug,
-      name: 'closing browser',
-    });
+      name: 'creating new page',
+    }).then(page =>
+      pFinally(
+        executeAsyncAction({
+          action: () => action(page),
+          debug,
+          name: 'executing action',
+        }),
+        () =>
+          executeAsyncAction({
+            action: () => context.close(),
+            debug,
+            name: 'closing context',
+          })
+      )
+    )
+  );
+};
 
-  // Puppeteer does not provide an API to create different browser contexts yet.
-  // See https://github.com/GoogleChrome/puppeteer/issues/85
-  // So in order to have tabs running in separate sessions with isolated cookies, local storage, etc.
-  // we launch a new instance of Chromium every time.
+const inBrowser = ({action, puppeteerOptions}) => {
+  const debug = namespacedDebug('inBrowser');
+
   return executeAsyncAction({
     action: () => puppeteer.launch(puppeteerOptions),
     debug,
-    name: 'isolated session creation',
+    name: 'launching browser',
   }).then(browser =>
-    browser
-      .newPage()
-      .then(page => action(page))
-      .then(
-        result => close(browser).then(() => result),
-        error =>
-          close(browser).then(() => {
-            throw error;
-          })
-      )
+    pFinally(
+      executeAsyncAction({
+        action: () =>
+          action(innerAction =>
+            inIncognitoContext({action: innerAction, browser})
+          ),
+        debug,
+        name: 'executing action',
+      }),
+      () =>
+        executeAsyncAction({
+          action: () => browser.close(),
+          debug,
+          name: 'closing browser',
+        })
+    )
   );
 };
 
@@ -114,7 +140,7 @@ const waitForEvaluationContext = ({page, timeoutInMilliseconds}) => {
 
 module.exports = {
   executeAsyncAction,
-  inIsolatedSession,
+  inBrowser,
   namespacedDebug,
   rejectAfterTimeout,
   waitForEvaluationContext,

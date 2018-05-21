@@ -1,7 +1,6 @@
 'use strict';
 
 const {
-  exportPdf,
   pdfExportExamplePayload,
   pdfExportPayloadSchema,
 } = require('@activeviam/browser-based-export');
@@ -17,7 +16,7 @@ const ensureJson = message => {
 };
 
 // We use declarative routing to provide living documentation for free.
-const getRoutes = config => {
+const getRoutes = ({config, exportPdf}) => {
   const routes = {
     '/': {
       GET: {
@@ -37,7 +36,7 @@ const getRoutes = config => {
     '/v1/pdf': {
       POST: {
         description:
-          'Open the given URL with Headless Chromium, export what is displayed as a PDF and download it.',
+          'Open the given URL with Headless Chromium, export what is displayed as a PDF, and download it.',
         example: pdfExportExamplePayload,
         handle(req, res) {
           const {body} = req;
