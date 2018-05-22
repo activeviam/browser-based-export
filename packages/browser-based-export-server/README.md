@@ -4,9 +4,5 @@
 
 # Usage
 
-Start the server with the `node start` command.
-
-The `GET /` route will list all the availabe routes.
-
-The server can be configured through environment variables.
-Take a look at the [config file](src/config.js) to see the available options.
+1.  `npm install -g browser-based-export-server`
+2.  `browser-based-export-server`
