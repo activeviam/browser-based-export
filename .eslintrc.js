@@ -19,18 +19,13 @@ module.exports = {
   rules: {
     'capitalized-comments': 'off',
     eqeqeq: ['error', 'smart'],
-    'init-declarations': 'off',
     'line-comment-position': 'off',
     'linebreak-style': 'off',
     'multiline-comment-style': 'off',
-    'no-empty-function': 'off',
-    'no-eq-null': 'off',
     'no-inline-comments': 'off',
     'no-magic-numbers': 'off',
-    'no-prototype-builtins': 'off',
     'no-ternary': 'off',
     'no-undefined': 'off',
-    'no-underscore-dangle': 'off',
     'no-warning-comments': 'off',
     'one-var': 'off',
     // We can disable the following rule as the use of schemas
