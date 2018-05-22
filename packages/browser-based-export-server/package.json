@@ -4,8 +4,8 @@
     "url": "https://github.com/activeviam/browser-based-export/issues"
   },
   "dependencies": {
-    "browser-based-export": "0.1.0",
     "body-parser": "1.18.3",
+    "browser-based-export": "0.1.1",
     "envalid": "4.1.4",
     "express": "4.16.3",
     "express-winston": "2.5.1",
@@ -14,8 +14,7 @@
     "winston": "2.4.2",
     "yargs": "11.0.0"
   },
-  "description":
-    "Node.js server exposing an API to export a web application at a given URL to a PDF file",
+  "description": "Node.js server exposing an API to export a web application at a given URL to a PDF file",
   "devDependencies": {
     "request": "2.87.0",
     "request-promise-native": "1.0.5"
@@ -43,5 +42,5 @@
   "scripts": {
     "start": "node start"
   },
-  "version": "0.1.0"
+  "version": "0.1.1"
 }
