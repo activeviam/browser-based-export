@@ -32,7 +32,7 @@ inBrowser({
 });
 ```
 
-Here is an [example payload](examples.js).
+Here is an [example payload](src/examples.js).
 
 ## Troubleshooting
 
