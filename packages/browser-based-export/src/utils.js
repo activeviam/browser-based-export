@@ -99,10 +99,10 @@ const waitForEvaluationContext = ({page, timeoutInMilliseconds}) => {
 
   return executeAsyncAction({
     action: () =>
-      rejectAfterTimeout(
-        {
-          errorMessage: `Failed to wait for evaluation context under the given timeout of ${timeoutInMilliseconds} milliseconds.`,
-          promise: promiseRetry((retry, number) => {
+      rejectAfterTimeout({
+        errorMessage: `Failed to wait for evaluation context under the given timeout of ${timeoutInMilliseconds} milliseconds.`,
+        promise: promiseRetry(
+          (retry, number) => {
             debug(`attempt #${number}`);
 
             return page
@@ -127,11 +127,11 @@ const waitForEvaluationContext = ({page, timeoutInMilliseconds}) => {
                   throw error;
                 }
               );
-          }),
-          timeoutInMilliseconds,
-        },
-        {minTimeout: 50}
-      ),
+          },
+          {minTimeout: 10}
+        ),
+        timeoutInMilliseconds,
+      }),
     debug,
     name: 'wait for evaluation context',
   });

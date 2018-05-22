@@ -348,8 +348,9 @@ describe('waiting before triggering the export', () => {
         // not the one that happened when Chromium loaded the page in the first time.
         delayToWaitForInMilliseconds -
         // Puppeteer considers the network to actually be idle, when there has been no pending
-        // requests in the last 500 milliseconds.
-        500,
+        // requests for some amount of milliseconds.
+        // It's supposed to be 500ms but, in practice, it's consistently around 1s.
+        1000,
       getExperimentOptions: delayToWaitForInMilliseconds => ({
         appCallback(req, res) {
           setTimeout(() => {
@@ -373,9 +374,7 @@ describe('waiting before triggering the export', () => {
         },
       }),
       jestTimeoutInMilliseconds: 10000,
-      // That's a big tolerance!
-      // The behavior is the expected one, it's just Chromium taking its time...
-      tolerance: 0.6,
+      tolerance: 0.3,
     });
   });
 });
