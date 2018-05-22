@@ -3,7 +3,7 @@
   "name": "@activeviam/browser-based-export-server",
   "description": "Browser-based Export Server",
   "version": "0.1.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node start"
   },

@@ -6,12 +6,11 @@ const StringReplacePlugin = require('string-replace-webpack-plugin');
 
 const {
   directories: {lib: outputDirectory},
-  main: entryFilename,
 } = require('./package');
 const packageDirectory = path.dirname(require.resolve('./package'));
 
 module.exports = {
-  entry: path.join(packageDirectory, entryFilename),
+  entry: require.resolve('./src'),
   mode: 'production',
   module: {
     rules: [

@@ -5,7 +5,7 @@ const pFinally = require('p-finally');
 const promiseRetry = require('promise-retry');
 const puppeteer = require('puppeteer/lib/Puppeteer');
 
-const {name: packageName} = require('./package');
+const {name: packageName} = require('../package');
 
 const namespacedDebug = action => globalDebug(`${packageName}:${action}`);
 

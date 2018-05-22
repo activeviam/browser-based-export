@@ -3,7 +3,6 @@
   "name": "@activeviam/browser-based-pdf-export-lambda",
   "description": "Browser-based PDF Export AWS Lambda",
   "version": "0.1.0",
-  "main": "index.js",
   "dependencies": {
     "@activeviam/browser-based-export": "0.1.0",
     "envalid": "4.1.2"

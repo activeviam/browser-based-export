@@ -4,7 +4,7 @@
 
 const request = require('request-promise-native');
 
-const {withServer} = require('./server');
+const {withServer} = require('..');
 
 const testEnvironment = {};
 const timeoutInSeconds = 3;

@@ -9,7 +9,7 @@ const pFinally = require('p-finally');
 const pTime = require('p-time');
 const pdfText = require('pdf-text');
 
-const {inBrowser} = require('.');
+const {inBrowser} = require('..');
 
 const testEnvironment = {};
 

@@ -2,7 +2,7 @@
   "private": true,
   "name": "@activeviam/browser-based-export",
   "version": "0.1.0",
-  "main": "export.js",
+  "main": "src/export.js",
   "devDependencies": {
     "cookie-parser": "1.4.3",
     "express": "4.16.3",
