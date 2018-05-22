@@ -1,2 +1,4 @@
 /coverage/
 /packages/browser-based-pdf-export-lambda/dist/
+
+package.json
