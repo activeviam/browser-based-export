@@ -1,6 +1,6 @@
 'use strict';
 
-const {inBrowser} = require('@activeviam/browser-based-export');
+const {inBrowser} = require('browser-based-export');
 const bodyParser = require('body-parser');
 const express = require('express');
 const expressWinston = require('express-winston');

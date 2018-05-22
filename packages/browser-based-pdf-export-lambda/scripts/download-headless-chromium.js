@@ -9,7 +9,7 @@ const fetch = require('node-fetch');
 const decompress = require('decompress');
 const decompressUnzip = require('decompress-unzip');
 
-const {chromiumRevision} = require('@activeviam/browser-based-export');
+const {chromiumRevision} = require('browser-based-export');
 
 const {
   directories: {lib: outputDirectory},

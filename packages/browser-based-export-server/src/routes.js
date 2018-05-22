@@ -3,7 +3,7 @@
 const {
   pdfExportExamplePayload,
   pdfExportPayloadSchema,
-} = require('@activeviam/browser-based-export');
+} = require('browser-based-export');
 const winston = require('winston');
 
 const ensureJson = message => {

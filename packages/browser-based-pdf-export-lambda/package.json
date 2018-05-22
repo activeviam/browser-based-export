@@ -1,10 +1,7 @@
 {
-  "private": true,
-  "name": "@activeviam/browser-based-pdf-export-lambda",
   "description": "Browser-based PDF Export AWS Lambda",
-  "version": "0.1.0",
   "dependencies": {
-    "@activeviam/browser-based-export": "0.1.0",
+    "browser-based-export": "0.1.0",
     "envalid": "4.1.2"
   },
   "devDependencies": {
@@ -23,13 +20,14 @@
     "lib": "dist"
   },
   "engines": {
-    "node": ">= 8.10.0",
-    "yarn": ">= 1.5.1"
+    "node": ">= 8.10.0"
   },
-  "files": ["dist/"],
+  "name": "browser-based-pdf-export-lambda",
   "scripts": {
-    "postinstall": "node scripts/download-headless-chromium",
     "build": "webpack-cli && yarn run zip",
+    "postinstall": "node scripts/download-headless-chromium",
     "zip": "node scripts/zip"
-  }
+  },
+  "private": true,
+  "version": "0.1.0"
 }

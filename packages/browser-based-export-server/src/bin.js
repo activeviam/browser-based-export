@@ -26,8 +26,8 @@ yargs
       'The `GET /` route will list all the availabe routes.',
       '',
       'Troubleshooting:',
-      "This package's main dependency `@activeviam/browser-based-export` is using the https://www.npmjs.com/package/debug utility.",
-      'Set the `DEBUG` environment variable to `@activeviam/browser-based-export:*` to see the debug messages',
+      "This package's main dependency `browser-based-export` is using the https://www.npmjs.com/package/debug utility.",
+      'Set the `DEBUG` environment variable to `browser-based-export:*` to see the debug messages',
       "If that's not enough, you can follow https://github.com/GoogleChrome/puppeteer/tree/v1.4.0#debugging-tips",
     ].join('\n'),
     handler() {

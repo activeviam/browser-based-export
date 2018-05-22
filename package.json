@@ -1,10 +1,4 @@
 {
-  "scripts": {
-    "eslint": "eslint . --max-warnings 0",
-    "build": "lerna run build --stream --reject-cycles",
-    "prettier": "prettier \"**/*.{js,json,md}\"",
-    "test": "jest"
-  },
   "devDependencies": {
     "eslint": "4.19.1",
     "eslint-config-prettier": "2.9.0",
@@ -26,6 +20,12 @@
       }
     }
   },
-  "workspaces": ["packages/*"],
-  "private": true
+  "private": true,
+  "scripts": {
+    "build": "lerna run build --stream --reject-cycles",
+    "eslint": "eslint . --max-warnings 0",
+    "prettier": "prettier \"**/*.{js,json,md}\"",
+    "test": "jest"
+  },
+  "workspaces": ["packages/*"]
 }

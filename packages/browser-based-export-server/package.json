@@ -1,15 +1,10 @@
 {
-  "private": true,
-  "name": "@activeviam/browser-based-export-server",
-  "description": "Browser-based Export Server",
-  "version": "0.1.0",
   "bin": "src/bin.js",
-  "main": "src/server.js",
-  "scripts": {
-    "start": "node start"
+  "bugs": {
+    "url": "https://github.com/activeviam/browser-based-export/issues"
   },
   "dependencies": {
-    "@activeviam/browser-based-export": "0.1.0",
+    "browser-based-export": "0.1.0",
     "body-parser": "1.18.3",
     "envalid": "4.1.4",
     "express": "4.16.3",
@@ -19,12 +14,34 @@
     "winston": "2.4.2",
     "yargs": "11.0.0"
   },
+  "description":
+    "Node.js server exposing an API to export a web application at a given URL to a PDF file",
   "devDependencies": {
     "request": "2.87.0",
     "request-promise-native": "1.0.5"
   },
   "engines": {
-    "node": ">= 8.10.0",
-    "yarn": ">= 1.5.1"
-  }
+    "node": ">= 8.10.0"
+  },
+  "keywords": [
+    "browser",
+    "chrome",
+    "chromium",
+    "export",
+    "headless",
+    "pdf",
+    "puppeteer",
+    "server"
+  ],
+  "license": "MIT",
+  "main": "src/server.js",
+  "name": "browser-based-export-server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/activeviam/browser-based-export"
+  },
+  "scripts": {
+    "start": "node start"
+  },
+  "version": "0.1.0"
 }

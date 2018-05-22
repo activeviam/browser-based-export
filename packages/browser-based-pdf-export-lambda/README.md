@@ -25,7 +25,7 @@ To create the deployable .zip file, run the following command: `yarn install && 
 
 ## Troubleshooting
 
-This package's main dependency `@activeviam/browser-based-export` is using the [debug](https://www.npmjs.com/package/debug) utility.
-Set the `DEBUG` environment variable to `@activeviam/browser-based-export:*` to see the debug messages.
+This package's main dependency `browser-based-export` is using the [debug](https://www.npmjs.com/package/debug) utility.
+Set the `DEBUG` environment variable to `browser-based-export:*` to see the debug messages.
 
 If that's not enough, you can follow the [Puppeteer debugging tips](https://github.com/GoogleChrome/puppeteer/tree/v1.4.0#debugging-tips).
