@@ -2,6 +2,7 @@
 
 const globalDebug = require('debug');
 const pFinally = require('p-finally');
+const pTimeout = require('p-timeout');
 const promiseRetry = require('promise-retry');
 const puppeteer = require('puppeteer/lib/Puppeteer');
 
@@ -84,12 +85,10 @@ const inBrowser = ({action, puppeteerOptions}) => {
 };
 
 const rejectAfterTimeout = ({errorMessage, promise, timeoutInMilliseconds}) =>
-  Promise.race([
-    promise,
-    new Promise((resolve, reject) => {
-      setTimeout(() => reject(new Error(errorMessage)), timeoutInMilliseconds);
-    }),
-  ]);
+  pTimeout(promise, timeoutInMilliseconds, () => {
+    namespacedDebug('rejectAfterTimeout')(errorMessage);
+    throw new Error(errorMessage);
+  });
 
 // TODO: When https://github.com/GoogleChrome/puppeteer/issues/1325 is fixed:
 // - remove this function
