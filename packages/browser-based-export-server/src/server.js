@@ -1,5 +1,7 @@
 'use strict';
 
+const {promisify} = require('util');
+
 const {inBrowser} = require('browser-based-export');
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -27,19 +29,7 @@ const useLogging = (app, {colorize, level}) => {
   });
 };
 
-const closeServer = server =>
-  new Promise((resolve, reject) => {
-    server.close(error => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
-
-const withServer = ({
-  action,
+const startServer = ({
   app,
   port = 0, // Use 0 to let the OS pick any available port.
 }) =>
@@ -47,16 +37,19 @@ const withServer = ({
     const server = app.listen(port, error => {
       if (error) {
         reject(error);
+      } else {
+        resolve(server);
       }
-
-      const close = () => closeServer(server);
-
-      pFinally(action({port: server.address().port}), close).then(
-        resolve,
-        reject
-      );
     });
   });
+
+const withServer = async ({action, app, port}) => {
+  const server = await startServer({app, port});
+  return pFinally(
+    action({port: server.address().port}),
+    promisify(server.close.bind(server))
+  );
+};
 
 const inBrowserWithServer = ({
   action = ({port}) =>

@@ -48,14 +48,11 @@ const authenticate = ({
     }
 
     return executeAsyncAction({
-      action: () =>
-        page
-          .cookies()
-          .then(existingCookies =>
-            page
-              .deleteCookie(...existingCookies)
-              .then(() => page.setCookie(...cookies))
-          ),
+      action: async () => {
+        const existingCookies = await page.cookies();
+        await page.deleteCookie(...existingCookies);
+        await page.setCookie(...cookies);
+      },
       debug: debugCookies,
       name: 'cookies injection',
     });
@@ -78,14 +75,15 @@ const authenticate = ({
   };
 
   return executeAsyncAction({
-    action: () =>
-      executeAsyncAction({
+    action: async () => {
+      await executeAsyncAction({
         action: () => page.goto(url),
         debug,
         name: 'navigation',
-      })
-        .then(() => waitForEvaluationContext({page, timeoutInMilliseconds}))
-        .then(() => Promise.all([injectCookies(), injectWebStorageItems()])),
+      });
+      await waitForEvaluationContext({page, timeoutInMilliseconds});
+      await Promise.all([injectCookies(), injectWebStorageItems()]);
+    },
     debug,
     name: 'authentication',
   });
@@ -137,25 +135,25 @@ const resize = ({dimensions, page}) => {
   const debug = namespacedDebug('resize');
 
   return executeAsyncAction({
-    action: () =>
-      executeAsyncAction({
+    action: async () => {
+      await executeAsyncAction({
         action: () => page.setViewport(dimensions),
         debug,
         name: 'set viewport',
-      }).then(() =>
-        // Ideally, we should not need to change the style of the body tag.
-        // It's an issue upstream in Puppeteer.
-        // See https://github.com/GoogleChrome/puppeteer/issues/1815
-        executeAsyncAction({
-          action: () =>
-            page.evaluate(dedent`
-              const bodyStyle = document.getElementsByTagName('body')[0].style;
-              bodyStyle.width = '${dimensions.width}px';
-              bodyStyle.height = '${dimensions.height}px';`),
-          debug,
-          name: 'set body size',
-        })
-      ),
+      });
+      // Ideally, we should not need to change the style of the body tag.
+      // It's an issue upstream in Puppeteer.
+      // See https://github.com/GoogleChrome/puppeteer/issues/1815
+      return executeAsyncAction({
+        action: () =>
+          page.evaluate(dedent`
+            const bodyStyle = document.getElementsByTagName('body')[0].style;
+            bodyStyle.width = '${dimensions.width}px';
+            bodyStyle.height = '${dimensions.height}px';`),
+        debug,
+        name: 'set body size',
+      });
+    },
     debug,
     name: 'resize browser page',
   });
@@ -229,39 +227,35 @@ const exportPdf = ({inIncognitoContext, payload, timeoutInSeconds}) => {
     action: () =>
       rejectAfterTimeout({
         errorMessage: `Failed to perform the export under the given timeout of ${timeoutInSeconds} seconds.`,
-        promise: inIncognitoContext(page =>
-          authenticate({
+        promise: inIncognitoContext(async page => {
+          await authenticate({
             authentication: payload.authentication,
             page,
             timeoutInMilliseconds,
             url: payload.url,
-          })
-            .then(() =>
-              Promise.all([
-                gotoPage({page, url: payload.url}),
-                waitForEvaluationContext({
-                  page,
-                  timeoutInMilliseconds,
-                })
-                  .then(() =>
-                    waitUntilReadyStateComplete({page, timeoutInMilliseconds})
-                  )
-                  .then(() =>
-                    Promise.all([
-                      resize({dimensions, page}),
-                      waitUntilRenderComplete({page, timeoutInMilliseconds}),
-                    ])
-                  ),
-                waitUntilNetworkIdle({
-                  page,
-                  timeoutInMilliseconds,
-                  waitUntil: payload.waitUntil,
-                }),
-              ])
-            )
-            .then(() => waitForIdleBrowser({page}))
-            .then(() => generatePdf({dimensions, page}))
-        ),
+          });
+          await Promise.all([
+            gotoPage({page, url: payload.url}),
+            (async () => {
+              await waitForEvaluationContext({
+                page,
+                timeoutInMilliseconds,
+              });
+              await waitUntilReadyStateComplete({page, timeoutInMilliseconds});
+              await Promise.all([
+                resize({dimensions, page}),
+                waitUntilRenderComplete({page, timeoutInMilliseconds}),
+              ]);
+            })(),
+            waitUntilNetworkIdle({
+              page,
+              timeoutInMilliseconds,
+              waitUntil: payload.waitUntil,
+            }),
+          ]);
+          await waitForIdleBrowser({page});
+          return generatePdf({dimensions, page});
+        }),
         timeoutInMilliseconds,
       }),
     debug: namespacedDebug('exportPdf'),
@@ -272,12 +266,10 @@ const exportPdf = ({inIncognitoContext, payload, timeoutInSeconds}) => {
 const inBrowser = ({action, puppeteerOptions}) =>
   inAgnosticBrowser({
     action: inIncognitoContext =>
-      Promise.resolve().then(() =>
-        action({
-          exportPdf: ({payload, timeoutInSeconds}) =>
-            exportPdf({inIncognitoContext, payload, timeoutInSeconds}),
-        })
-      ),
+      action({
+        exportPdf: ({payload, timeoutInSeconds}) =>
+          exportPdf({inIncognitoContext, payload, timeoutInSeconds}),
+      }),
     puppeteerOptions,
   });
 

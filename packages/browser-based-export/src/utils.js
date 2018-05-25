@@ -10,77 +10,72 @@ const {name: packageName} = require('../package');
 
 const namespacedDebug = action => globalDebug(`${packageName}:${action}`);
 
-const executeAsyncAction = ({action, debug, name}) =>
-  Promise.resolve()
-    .then(() => {
-      debug(`[${name}] started`);
-    })
-    .then(action)
-    .then(
-      result => {
-        debug(`[${name}] finished`);
-        return result;
-      },
-      error => {
-        debug(`[${name}] failed`);
-        throw error;
-      }
-    );
+const executeAsyncAction = async ({action, debug, name}) => {
+  debug(`[${name}] started`);
+  try {
+    const result = await action();
+    debug(`[${name}] finished`);
+    return result;
+  } catch (error) {
+    debug(`[${name}] failed`);
+    throw error;
+  }
+};
 
-const inIncognitoContext = ({action, browser}) => {
+const inIncognitoContext = async ({action, browser}) => {
   const debug = namespacedDebug('inIncognitoContext');
 
-  return executeAsyncAction({
+  const context = await executeAsyncAction({
     action: () => browser.createIncognitoBrowserContext(),
     debug,
     name: 'creating incognito context',
-  }).then(context =>
+  });
+
+  const page = await executeAsyncAction({
+    action: () => context.newPage(),
+    debug,
+    name: 'creating new page',
+  });
+
+  return pFinally(
     executeAsyncAction({
-      action: () => context.newPage(),
+      action: () => action(page),
       debug,
-      name: 'creating new page',
-    }).then(page =>
-      pFinally(
-        executeAsyncAction({
-          action: () => action(page),
-          debug,
-          name: 'executing action',
-        }),
-        () =>
-          executeAsyncAction({
-            action: () => context.close(),
-            debug,
-            name: 'closing context',
-          })
-      )
-    )
+      name: 'executing action',
+    }),
+    () =>
+      executeAsyncAction({
+        action: () => context.close(),
+        debug,
+        name: 'closing context',
+      })
   );
 };
 
-const inBrowser = ({action, puppeteerOptions}) => {
+const inBrowser = async ({action, puppeteerOptions}) => {
   const debug = namespacedDebug('inBrowser');
 
-  return executeAsyncAction({
+  const browser = await executeAsyncAction({
     action: () => puppeteer.launch(puppeteerOptions),
     debug,
     name: 'launching browser',
-  }).then(browser =>
-    pFinally(
+  });
+
+  return pFinally(
+    executeAsyncAction({
+      action: () =>
+        action(innerAction =>
+          inIncognitoContext({action: innerAction, browser})
+        ),
+      debug,
+      name: 'executing action',
+    }),
+    () =>
       executeAsyncAction({
-        action: () =>
-          action(innerAction =>
-            inIncognitoContext({action: innerAction, browser})
-          ),
+        action: () => browser.close(),
         debug,
-        name: 'executing action',
-      }),
-      () =>
-        executeAsyncAction({
-          action: () => browser.close(),
-          debug,
-          name: 'closing browser',
-        })
-    )
+        name: 'closing browser',
+      })
   );
 };
 
@@ -102,31 +97,28 @@ const waitForEvaluationContext = ({page, timeoutInMilliseconds}) => {
       rejectAfterTimeout({
         errorMessage: `Failed to wait for evaluation context under the given timeout of ${timeoutInMilliseconds} milliseconds.`,
         promise: promiseRetry(
-          (retry, number) => {
+          async (retry, number) => {
             debug(`attempt #${number}`);
 
-            return page
-              .evaluate('1 + 1', {
+            try {
+              await page.evaluate('1 + 1', {
                 timeout: timeoutInMilliseconds,
-              })
-              .then(
-                () => {
-                  debug(`attempt successful`);
-                },
-                error => {
-                  if (
-                    error.message.includes(
-                      'Cannot find context with specified id undefined'
-                    )
-                  ) {
-                    debug('missing context, retrying');
-                    return retry(error);
-                  }
+              });
+              debug(`attempt successful`);
+              return Promise.resolve();
+            } catch (error) {
+              if (
+                error.message.includes(
+                  'Cannot find context with specified id undefined'
+                )
+              ) {
+                debug('missing context, retrying');
+                return retry(error);
+              }
 
-                  debug('received non-context related error, rethrowing');
-                  throw error;
-                }
-              );
+              debug('received non-context related error, rethrowing');
+              throw error;
+            }
           },
           {minTimeout: 10}
         ),

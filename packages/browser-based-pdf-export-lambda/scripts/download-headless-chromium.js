@@ -27,22 +27,21 @@ assert.equal(
 const zipUrl =
   'https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-44/dev-headless-chromium-amazonlinux-2017-03.zip';
 
-fs
-  .pathExists(path.join(outputDirectoryPath, 'headless-chromium'))
-  .then(alreadyDownloaded => {
-    if (alreadyDownloaded) {
-      console.log('Headless Chromium has already been download.');
-    } else {
-      console.log('Downloading Headless Chromium...');
-      fetch(zipUrl)
-        .then(response => response.buffer())
-        .then(buffer =>
-          decompress(buffer, outputDirectoryPath, {
-            plugins: [decompressUnzip()],
-          })
-        )
-        .then(() => {
-          console.log('Headless Chromium downloaded successfully.');
-        });
-    }
-  });
+const download = async () => {
+  const alreadyDownloaded = await fs.pathExists(
+    path.join(outputDirectoryPath, 'headless-chromium')
+  );
+  if (alreadyDownloaded) {
+    console.log('Headless Chromium has already been download.');
+  } else {
+    console.log('Downloading Headless Chromium...');
+    const response = await fetch(zipUrl);
+    const buffer = await response.buffer();
+    await decompress(buffer, outputDirectoryPath, {
+      plugins: [decompressUnzip()],
+    });
+    console.log('Headless Chromium downloaded successfully.');
+  }
+};
+
+download();

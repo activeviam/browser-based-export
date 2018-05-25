@@ -2,5 +2,6 @@
 !.*.js
 
 /coverage/
-node_modules/
 /packages/browser-based-pdf-export-lambda/dist/
+
+node_modules/

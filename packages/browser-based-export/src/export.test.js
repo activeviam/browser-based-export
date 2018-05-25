@@ -3,11 +3,13 @@
 
 'use strict';
 
+const {promisify} = require('util');
+
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const pFinally = require('p-finally');
 const pTime = require('p-time');
-const pdfText = require('pdf-text');
+const pdfText = promisify(require('pdf-text'));
 
 const {inBrowser} = require('..');
 
@@ -26,38 +28,32 @@ beforeAll(() =>
 
 afterAll(() => testEnvironment.resolve());
 
-const withServer = ({appCallback, onReadyCallback}) => {
+const startServer = app =>
+  new Promise((resolve, reject) => {
+    const server = app.listen(
+      0, // Let the OS pick an available port so that we can have several servers running in parallel.
+      error => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(server);
+        }
+      }
+    );
+  });
+
+const withServer = async ({appCallback, onReadyCallback}) => {
   const app = express();
 
   app.use(cookieParser());
   app.get('/', appCallback);
 
-  return new Promise((resolve, reject) => {
-    const server = app.listen(
-      // Let the OS pick an available port so that we can have several servers running in parallel.
-      0,
-      error => {
-        if (error) {
-          reject(error);
-        }
-
-        const serverUrl = `http://localhost:${server.address().port}`;
-        pFinally(
-          onReadyCallback(serverUrl),
-          () =>
-            new Promise((resolveClose, rejectClose) => {
-              server.close(closeError => {
-                if (closeError) {
-                  rejectClose(closeError);
-                } else {
-                  resolveClose();
-                }
-              });
-            })
-        ).then(resolve, reject);
-      }
-    );
-  });
+  const server = await startServer(app);
+  const serverUrl = `http://localhost:${server.address().port}`;
+  return pFinally(
+    onReadyCallback(serverUrl),
+    promisify(server.close.bind(server))
+  );
 };
 
 const getPdf = ({appCallback, exportOptions, timeoutInSeconds}) =>
@@ -70,19 +66,11 @@ const getPdf = ({appCallback, exportOptions, timeoutInSeconds}) =>
       }),
   });
 
-const getPdfText = options =>
-  getPdf(options).then(
-    pdf =>
-      new Promise((resolve, reject) => {
-        pdfText(pdf, (err, chunks) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(chunks.join(''));
-          }
-        });
-      })
-  );
+const getPdfText = async options => {
+  const pdf = await getPdf(options);
+  const chunks = await pdfText(pdf);
+  return chunks.join('');
+};
 
 const getHtmlWithScript = cb => {
   const rootId = 'root';
@@ -108,12 +96,15 @@ describe('authentication', () => {
     testExperiment,
   }) =>
     Promise.all(
-      [controlExperiment, testExperiment].map(({exportOptions, check}) =>
-        getPdfText({
-          appCallback,
-          exportOptions,
-          timeoutInSeconds,
-        }).then(check)
+      [controlExperiment, testExperiment].map(
+        async ({exportOptions, check}) => {
+          const text = await getPdfText({
+            appCallback,
+            exportOptions,
+            timeoutInSeconds,
+          });
+          check(text);
+        }
       )
     );
 
@@ -213,7 +204,7 @@ describe('waiting before triggering the export', () => {
   const waitingTestEnvironment = {};
 
   const controlExperimentTimeoutInSeconds = 3;
-  beforeAll(() => {
+  beforeAll(async () => {
     const controlExperiment = pTime(getPdfText)({
       appCallback(req, res) {
         res.send(responseText);
@@ -224,11 +215,10 @@ describe('waiting before triggering the export', () => {
       timeoutInSeconds: controlExperimentTimeoutInSeconds,
     });
 
-    return controlExperiment.then(controlText => {
-      expect(controlText).toBe(responseText);
-      Object.assign(waitingTestEnvironment, {
-        controlExperimentDurationInMilliseconds: controlExperiment.time,
-      });
+    const controlText = await controlExperiment;
+    expect(controlText).toBe(responseText);
+    Object.assign(waitingTestEnvironment, {
+      controlExperimentDurationInMilliseconds: controlExperiment.time,
     });
   }, controlExperimentTimeoutInSeconds * 1000);
 
@@ -276,7 +266,7 @@ describe('waiting before triggering the export', () => {
 
     test(
       'should not timeout',
-      () => {
+      async () => {
         const {
           delayToWaitForInMilliseconds,
           delayToWaitForInSeconds,
@@ -291,17 +281,16 @@ describe('waiting before triggering the export', () => {
           })
         );
 
-        return testExperiment.then(testText => {
-          expect(testText).toBe(responseText);
-          expectDuration(
-            getActualDelayWaitedMilliseconds({
-              delayToWaitForInMilliseconds,
-              testExperimentDurationInMilliseconds: testExperiment.time,
-            }),
+        const testText = await testExperiment;
+        expect(testText).toBe(responseText);
+        expectDuration(
+          getActualDelayWaitedMilliseconds({
             delayToWaitForInMilliseconds,
-            tolerance
-          );
-        });
+            testExperimentDurationInMilliseconds: testExperiment.time,
+          }),
+          delayToWaitForInMilliseconds,
+          tolerance
+        );
       },
       jestTimeoutInMilliseconds
     );
@@ -374,7 +363,7 @@ describe('waiting before triggering the export', () => {
         },
       }),
       jestTimeoutInMilliseconds: 10000,
-      tolerance: 0.3,
+      tolerance: 0.45,
     });
   });
 });

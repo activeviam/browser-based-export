@@ -5,6 +5,7 @@
     "eslint-plugin-node": "6.0.1",
     "eslint-plugin-prettier": "2.6.0",
     "eslint-plugin-security": "1.4.0",
+    "eslint-plugin-unicorn": "4.0.3",
     "jest": "22.4.4",
     "jest-junit": "4.0.0",
     "lerna": "2.11.0",
@@ -13,7 +14,7 @@
   "jest": {
     "coverageThreshold": {
       "global": {
-        "branches": 85,
+        "branches": 90,
         "functions": 95,
         "lines": 95,
         "statements": 95
