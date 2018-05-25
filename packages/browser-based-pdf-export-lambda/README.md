@@ -1,19 +1,15 @@
+[![build status](https://img.shields.io/circleci/project/github/activeviam/browser-based-export.svg)](https://circleci.com/gh/activeviam/browser-based-export)
+
 # Goal
 
-`browser-based-pdf-export-lambda` creates a .zip file deployable as a Node.js AWS Lambda to export a web application at a given URL to a PDF file.
+`browser-based-pdf-export-lambda` is an AWS Lambda made for exporting a web application at a given URL to a PDF file.
 
 # Usage
-
-## Build
-
-To create the deployable .zip file, run the following command: `yarn install && yarn run build`.
-
-## Deployment
 
 1.  Create a Node.js AWS Lambda function "from scratch" with the "Node.js 8.10" runtime.
 2.  Click on your Lambda tile in the "Designer" panel.
     Under the "Function code" section, change the "Code entry type" to "Upload a .zip file".
-3.  Upload the previously created .zip file.
+3.  Upload one of the [released .zip files](https://github.com/activeviam/browser-based-export/releases).
 4.  Add the desired [environment variables](src/config.js), configure the "Timeout" under the "Basic Settings" and increase the "Memory" to 1GB for instance.
 5.  Add an "API Gateway" trigger under the "Designer" section.
 6.  Click on the "save" button on the upper right corner.
@@ -22,10 +18,5 @@ To create the deployable .zip file, run the following command: `yarn install && 
     Go to the "settings" tab of the corresponding "API".
     Add the "\*/\*" entry in the "Binary Media Types" section.
 8.  Trigger the "Deploy API" action in the "resources" tab.
-
-## Troubleshooting
-
-This package's main dependency `browser-based-export` is using the [debug](https://www.npmjs.com/package/debug) utility.
-Set the `DEBUG` environment variable to `browser-based-export:*` to see the debug messages.
-
-If that's not enough, you can follow the [Puppeteer debugging tips](https://github.com/GoogleChrome/puppeteer/tree/v1.4.0#debugging-tips).
+9.  Your AWS Lambda should now be live, you can start sending it requests.
+    See [`browser-based-export`'s README](../browser-based-export/README.md) for more information about what payload can be sent to the AWS Lambda and troubleshooting.

@@ -1,14 +1,17 @@
+[![npm version](https://img.shields.io/npm/v/browser-based-export.svg)](https://npmjs.org/package/browser-based-export)
+[![build status](https://img.shields.io/circleci/project/github/activeviam/browser-based-export.svg)](https://circleci.com/gh/activeviam/browser-based-export)
+
 # Goal
 
 `browser-based-export` is a wrapper on top of [Puppeteer](https://github.com/GoogleChrome/puppeteer)'s export to PDF feature.
 
-It can handle authentication by injecting cookies or _localStorage_ items into Headless Chromium.
+It can handle authentication by injecting cookies or [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) items into Headless Chromium.
 It also generates better looking PDF than Puppeteer by resizing the browser page to the paper format before triggering the PDF export.
 
 ## Export isolation
 
 Every export happens in an isolated incognito Chromium context.
-It means that the cookies, [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) items or any sensitive information will not be shared across exports.
+It means that the cookies, Web Storage items or any sensitive information will not be shared across exports.
 Even if they are launched in parallel.
 
 # Usage
@@ -20,10 +23,10 @@ const {inBrowser} = require('browser-based-export');
 
 // Start Headless Chromium and automatically close it when the passed callback resolves.
 inBrowser({
-  action: ({exportPdf) =>
+  action: ({exportPdf}) =>
     exportPdf({
       payload: {
-        /* */
+        url: 'https://example.com',
       },
       timeoutInSeconds: 10,
     }).then(pdfBuffer => {
@@ -32,7 +35,10 @@ inBrowser({
 });
 ```
 
-Here is an [example payload](src/examples.js).
+Take a look at:
+
+* an [example payload](src/examples.js)
+* the [payload schema](src/schemas.js)
 
 ## Troubleshooting
 
