@@ -8,7 +8,7 @@
 It can handle authentication by injecting cookies or [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) items into Headless Chromium.
 It also generates better looking PDF than Puppeteer by resizing the browser page to the paper format before triggering the PDF export.
 
-The library is also available as a [server](https://npmjs.org/package/browser-based-export-server) and an [AWS Lambda](https://github.com/activeviam/browser-based-export/tree/master/packages/browser-based-pdf-export-lambda).
+The library is also available as a [server](https://npmjs.org/package/browser-based-export-server) and an [AWS Lambda function](https://github.com/activeviam/browser-based-export/tree/master/packages/browser-based-pdf-export-lambda).
 
 ## Export isolation
 
