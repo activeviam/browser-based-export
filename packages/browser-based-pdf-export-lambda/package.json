@@ -1,7 +1,7 @@
 {
   "description": "Browser-based PDF Export AWS Lambda",
   "dependencies": {
-    "browser-based-export": "0.1.2",
+    "browser-based-export": "0.1.4",
     "envalid": "4.1.2"
   },
   "devDependencies": {
@@ -29,5 +29,5 @@
     "zip": "node scripts/zip"
   },
   "private": true,
-  "version": "0.1.2"
+  "version": "0.1.4"
 }
