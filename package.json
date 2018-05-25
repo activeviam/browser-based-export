@@ -25,6 +25,7 @@
   "scripts": {
     "build": "lerna run build --stream --reject-cycles",
     "eslint": "eslint . --max-warnings 0",
+    "prepublish": "yarn run build",
     "prettier": "prettier \"**/*.{js,json,md}\"",
     "test": "jest"
   },
