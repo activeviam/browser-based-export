@@ -3,6 +3,7 @@
 const path = require('path');
 
 const StringReplacePlugin = require('string-replace-webpack-plugin');
+const webpack = require('webpack');
 
 const {
   directories: {lib: outputDirectory},
@@ -11,22 +12,24 @@ const packageDirectory = path.dirname(require.resolve('./package'));
 
 module.exports = {
   entry: require.resolve('./src'),
-  mode: 'production',
+  // We don't want the code to be minified so we use the `development` mode.
+  // However, we will use a plugin below to set `process.env.NODE_ENV` to `production`.
+  mode: 'development',
   module: {
     rules: [
-      // We need to redefine the `PROJECT_ROOT` constant because its value is computed dynamically in
-      // puppeteer/lib/Downloader.js and thus Webpack cannot resolve some import paths statically.
+      // Replace dynamically computed path in puppeteer/lib/Launcher.js
+      // by a string literal understandable by Webpack.
       // See https://github.com/GoogleChrome/puppeteer/issues/1644.
       {
         loader: StringReplacePlugin.replace({
           replacements: [
             {
-              pattern: /path.join\(PROJECT_ROOT, 'package.json'\)/g,
-              replacement: () => "'../../package.json'",
+              pattern: /path.join\(helper.projectRoot\(\), 'package.json'\)/g,
+              replacement: () => "'../package.json'",
             },
           ],
         }),
-        test: /puppeteer\/node6\/lib\/Downloader.js$/,
+        test: /puppeteer\/lib\/Launcher.js$/,
       },
     ],
   },
@@ -35,6 +38,12 @@ module.exports = {
     libraryTarget: 'commonjs2',
     path: path.join(packageDirectory, outputDirectory),
   },
-  plugins: [new StringReplacePlugin()],
+  plugins: [
+    new StringReplacePlugin(),
+    // See comment above about our choice of `mode`.
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+  ],
   target: 'node',
 };

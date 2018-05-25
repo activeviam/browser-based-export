@@ -13,11 +13,8 @@ exports.handler = (event, context, callback) => {
     callback,
     config,
     event,
+    headlessChromiumPath: path.resolve('.', 'headless-chromium'),
     log: console.log.bind(console),
-    puppeteerOptions: {
-      args: ['--no-sandbox', '--single-process'],
-      executablePath: path.resolve('.', 'headless-chromium'),
-    },
     // Read the timeout from the AWS Lambda function configuration.
     timeoutInSeconds: Math.ceil(context.getRemainingTimeInMillis() / 1000),
   });

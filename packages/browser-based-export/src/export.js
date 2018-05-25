@@ -263,12 +263,23 @@ const exportPdf = ({inIncognitoContext, payload, timeoutInSeconds}) => {
   });
 };
 
-const inBrowser = ({action, puppeteerOptions}) =>
+const inBrowser = ({
+  // Set to `true` in browser-based-pdf-export-lambda.
+  // See https://github.com/GoogleChrome/puppeteer/issues/2608
+  _dontUseIncognitoContext = false,
+  action,
+  puppeteerOptions,
+}) =>
   inAgnosticBrowser({
+    _dontUseIncognitoContext,
     action: inIncognitoContext =>
       action({
         exportPdf: ({payload, timeoutInSeconds}) =>
-          exportPdf({inIncognitoContext, payload, timeoutInSeconds}),
+          exportPdf({
+            inIncognitoContext,
+            payload,
+            timeoutInSeconds,
+          }),
       }),
     puppeteerOptions,
   });

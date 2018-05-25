@@ -22,17 +22,11 @@ const executeAsyncAction = async ({action, debug, name}) => {
   }
 };
 
-const inIncognitoContext = async ({action, browser}) => {
-  const debug = namespacedDebug('inIncognitoContext');
-
-  const context = await executeAsyncAction({
-    action: () => browser.createIncognitoBrowserContext(),
-    debug,
-    name: 'creating incognito context',
-  });
+const inPage = async ({action, pageCreator}) => {
+  const debug = namespacedDebug('inPage');
 
   const page = await executeAsyncAction({
-    action: () => context.newPage(),
+    action: pageCreator.newPage.bind(pageCreator),
     debug,
     name: 'creating new page',
   });
@@ -45,14 +39,36 @@ const inIncognitoContext = async ({action, browser}) => {
     }),
     () =>
       executeAsyncAction({
-        action: () => context.close(),
+        action: page.close.bind(page),
         debug,
-        name: 'closing context',
+        name: 'closing page',
       })
   );
 };
 
-const inBrowser = async ({action, puppeteerOptions}) => {
+const inIncognitoContext = async ({action, browser}) => {
+  const debug = namespacedDebug('inIncognitoContext');
+
+  const context = await executeAsyncAction({
+    action: browser.createIncognitoBrowserContext.bind(browser),
+    debug,
+    name: 'creating incognito context',
+  });
+
+  return pFinally(inPage({action, pageCreator: context}), () =>
+    executeAsyncAction({
+      action: context.close.bind(context),
+      debug,
+      name: 'closing context',
+    })
+  );
+};
+
+const inBrowser = async ({
+  _dontUseIncognitoContext,
+  action,
+  puppeteerOptions,
+}) => {
   const debug = namespacedDebug('inBrowser');
 
   const browser = await executeAsyncAction({
@@ -64,15 +80,18 @@ const inBrowser = async ({action, puppeteerOptions}) => {
   return pFinally(
     executeAsyncAction({
       action: () =>
-        action(innerAction =>
-          inIncognitoContext({action: innerAction, browser})
+        action(
+          innerAction =>
+            _dontUseIncognitoContext
+              ? inPage({action: innerAction, pageCreator: browser})
+              : inIncognitoContext({action: innerAction, browser})
         ),
       debug,
       name: 'executing action',
     }),
     () =>
       executeAsyncAction({
-        action: () => browser.close(),
+        action: browser.close.bind(browser),
         debug,
         name: 'closing browser',
       })

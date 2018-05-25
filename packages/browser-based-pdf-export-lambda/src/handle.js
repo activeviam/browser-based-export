@@ -21,8 +21,8 @@ const handle = ({
   callback,
   config: {authorizedUrlRegex},
   event,
+  headlessChromiumPath,
   log,
-  puppeteerOptions,
   timeoutInSeconds,
 }) => {
   log({event});
@@ -36,26 +36,32 @@ const handle = ({
       }
 
       return inBrowser({
-        action: async ({exportPdf}) => {
-          const pdf = await exportPdf({
+        // See https://github.com/GoogleChrome/puppeteer/issues/2608
+        _dontUseIncognitoContext: true,
+        action: ({exportPdf}) =>
+          exportPdf({
             payload,
             timeoutInSeconds,
-          });
-          callback(null, {
-            // The body must be a string so we have to serialize the PDF buffer.
-            body: pdf.toString('base64'),
-            headers: {
-              'content-disposition': 'attachment',
-              'content-type': 'application/pdf',
-            },
-            // This flag is used to tell the API Gateway to convert the base64 string back to binary.
-            // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html.
-            // And https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html.
-            isBase64Encoded: true,
-            statusCode: 200,
-          });
+          }).then(pdf => {
+            callback(null, {
+              // The body must be a string so we have to serialize the PDF buffer.
+              body: pdf.toString('base64'),
+              headers: {
+                'content-disposition': 'attachment',
+                'content-type': 'application/pdf',
+              },
+              // This flag is used to tell the API Gateway to convert the base64 string back to binary.
+              // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings.html.
+              // And https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html.
+              isBase64Encoded: true,
+              statusCode: 200,
+            });
+          }),
+        puppeteerOptions: {
+          // See https://github.com/adieuadieu/serverless-chrome/issues/15#issuecomment-301774667
+          args: ['--no-sandbox', '--single-process'],
+          executablePath: headlessChromiumPath,
         },
-        puppeteerOptions,
       });
     })
     .catch(error => {

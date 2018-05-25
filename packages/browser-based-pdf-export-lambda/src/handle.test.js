@@ -1,6 +1,7 @@
 /* eslint-env jest */
 'use strict';
 
+const path = require('path');
 const {promisify} = require('util');
 
 const express = require('express');
@@ -19,6 +20,12 @@ const callHandler = payload =>
       },
       config: {authorizedUrlRegex: /localhost/},
       event: payload,
+      // Test against the same Chromium version than the one that will be bundled in the zip used in the AWS Lambda.
+      // It gives stronger guarantees than if we were using the version of Chromium downloaded by Puppeteer.
+      headlessChromiumPath: path.resolve(
+        __dirname,
+        '../dist/headless-chromium'
+      ),
       log() {
         /* noop */
       },
