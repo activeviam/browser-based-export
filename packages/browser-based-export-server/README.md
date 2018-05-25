@@ -5,6 +5,8 @@
 
 `browser-based-export-server` is a Node.js server, relying on [`browser-based-export`](https://www.npmjs.com/package/browser-based-export), to export a web application at a given URL to a PDF file.
 
+The server is also available as an [AWS Lambda](https://github.com/activeviam/browser-based-export/tree/master/packages/browser-based-pdf-export-lambda).
+
 # Usage
 
 1.  Install the server on your machine: `npm install -g browser-based-export-server`
