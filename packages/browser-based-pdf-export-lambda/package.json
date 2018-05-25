@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "browser-based-export": "0.1.4",
+    "browser-based-export": "0.1.5",
     "envalid": "4.1.2"
   },
   "devDependencies": {
@@ -28,5 +28,5 @@
     "zip": "node scripts/zip"
   },
   "private": true,
-  "version": "0.1.4"
+  "version": "0.1.5"
 }
