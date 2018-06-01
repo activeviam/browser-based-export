@@ -21,6 +21,13 @@ const {
 const ajv = new Ajv({useDefaults: true});
 const validate = ajv.compile(pdfExportPayloadSchema);
 
+const gotoPage = ({debug = namespacedDebug('gotoPage'), page, url}) =>
+  executeAsyncAction({
+    action: () => page.goto(url),
+    debug,
+    name: 'navigation',
+  });
+
 const getInjectWebStorageItem = ({key, type, value}) =>
   `window.${type}Storage.setItem("${escapeQuote(key)}", "${escapeQuote(
     value
@@ -76,25 +83,24 @@ const authenticate = ({
 
   return executeAsyncAction({
     action: async () => {
-      await executeAsyncAction({
-        action: () => page.goto(url),
-        debug,
-        name: 'navigation',
-      });
+      await gotoPage({debug, page, url});
       await waitForEvaluationContext({page, timeoutInMilliseconds});
       await Promise.all([injectCookies(), injectWebStorageItems()]);
+      // It's important to always reload the page because the application
+      // might read the cookies and Web Storage items only once at startup
+      // and consider the user to not be authenticated if they are not there at this time.
+      // By reloading the page, the added cookies and Web Storage items will
+      // be there since startup and the application will thus be able to read them.
+      await executeAsyncAction({
+        action: () => page.reload(),
+        debug,
+        name: 'reload',
+      });
     },
     debug,
     name: 'authentication',
   });
 };
-
-const gotoPage = ({page, url}) =>
-  executeAsyncAction({
-    action: () => page.goto(url),
-    debug: namespacedDebug('gotoPage'),
-    name: 'navigation',
-  });
 
 const waitUntilNetworkIdle = ({
   page,
