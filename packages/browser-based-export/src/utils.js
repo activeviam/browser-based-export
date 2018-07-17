@@ -24,11 +24,16 @@ const executeAsyncAction = async ({action, debug, name}) => {
 
 const inPage = async ({action, pageCreator}) => {
   const debug = namespacedDebug('inPage');
+  const consoleDebug = namespacedDebug('browser-console');
 
   const page = await executeAsyncAction({
     action: pageCreator.newPage.bind(pageCreator),
     debug,
     name: 'creating new page',
+  });
+
+  page.on('console', log => {
+    consoleDebug(log.text());
   });
 
   return pFinally(
