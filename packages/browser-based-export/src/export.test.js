@@ -7,7 +7,6 @@ const {promisify} = require('util');
 
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const pFinally = require('p-finally');
 const pTime = require('p-time');
 const pdfText = promisify(require('pdf-text'));
 
@@ -50,10 +49,12 @@ const withServer = async ({appCallback, onReadyCallback}) => {
 
   const server = await startServer(app);
   const serverUrl = `http://localhost:${server.address().port}`;
-  return pFinally(
-    onReadyCallback(serverUrl),
-    promisify(server.close.bind(server))
-  );
+
+  try {
+    return await onReadyCallback(serverUrl);
+  } finally {
+    await promisify(server.close.bind(server))();
+  }
 };
 
 const getPdf = ({appCallback, exportOptions, timeoutInSeconds}) =>
