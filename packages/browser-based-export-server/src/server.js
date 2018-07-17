@@ -6,7 +6,6 @@ const {inBrowser} = require('browser-based-export');
 const bodyParser = require('body-parser');
 const express = require('express');
 const expressWinston = require('express-winston');
-const pFinally = require('p-finally');
 const winston = require('winston');
 
 const getRoutes = require('./routes');
@@ -45,10 +44,11 @@ const startServer = ({
 
 const withServer = async ({action, app, port}) => {
   const server = await startServer({app, port});
-  return pFinally(
-    action({port: server.address().port}),
-    promisify(server.close.bind(server))
-  );
+  try {
+    return await action({port: server.address().port});
+  } finally {
+    await promisify(server.close.bind(server))();
+  }
 };
 
 const inBrowserWithServer = ({

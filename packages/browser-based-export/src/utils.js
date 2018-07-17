@@ -1,7 +1,6 @@
 'use strict';
 
 const globalDebug = require('debug');
-const pFinally = require('p-finally');
 const pTimeout = require('p-timeout');
 const promiseRetry = require('promise-retry');
 const puppeteer = require('puppeteer/lib/Puppeteer');
@@ -36,19 +35,19 @@ const inPage = async ({action, pageCreator}) => {
     consoleDebug(log.text());
   });
 
-  return pFinally(
-    executeAsyncAction({
+  try {
+    return await executeAsyncAction({
       action: () => action(page),
       debug,
       name: 'executing action',
-    }),
-    () =>
-      executeAsyncAction({
-        action: page.close.bind(page),
-        debug,
-        name: 'closing page',
-      })
-  );
+    });
+  } finally {
+    await executeAsyncAction({
+      action: page.close.bind(page),
+      debug,
+      name: 'closing page',
+    });
+  }
 };
 
 const inIncognitoContext = async ({action, browser}) => {
@@ -60,13 +59,15 @@ const inIncognitoContext = async ({action, browser}) => {
     name: 'creating incognito context',
   });
 
-  return pFinally(inPage({action, pageCreator: context}), () =>
-    executeAsyncAction({
+  try {
+    return await inPage({action, pageCreator: context});
+  } finally {
+    await executeAsyncAction({
       action: context.close.bind(context),
       debug,
       name: 'closing context',
-    })
-  );
+    });
+  }
 };
 
 const inBrowser = async ({
@@ -82,8 +83,8 @@ const inBrowser = async ({
     name: 'launching browser',
   });
 
-  return pFinally(
-    executeAsyncAction({
+  try {
+    return await executeAsyncAction({
       action: () =>
         action(
           innerAction =>
@@ -93,14 +94,14 @@ const inBrowser = async ({
         ),
       debug,
       name: 'executing action',
-    }),
-    () =>
-      executeAsyncAction({
-        action: browser.close.bind(browser),
-        debug,
-        name: 'closing browser',
-      })
-  );
+    });
+  } finally {
+    await executeAsyncAction({
+      action: browser.close.bind(browser),
+      debug,
+      name: 'closing browser',
+    });
+  }
 };
 
 const rejectAfterTimeout = ({errorMessage, promise, timeoutInMilliseconds}) =>
