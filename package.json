@@ -1,15 +1,15 @@
 {
   "devDependencies": {
-    "eslint": "4.19.1",
-    "eslint-config-prettier": "2.9.0",
-    "eslint-plugin-node": "6.0.1",
-    "eslint-plugin-prettier": "2.6.0",
+    "eslint": "5.13.0",
+    "eslint-config-prettier": "4.0.0",
+    "eslint-plugin-node": "8.0.1",
+    "eslint-plugin-prettier": "3.0.1",
     "eslint-plugin-security": "1.4.0",
-    "eslint-plugin-unicorn": "4.0.3",
-    "jest": "22.4.4",
-    "jest-junit": "4.0.0",
-    "lerna": "2.11.0",
-    "prettier": "1.12.1"
+    "eslint-plugin-unicorn": "7.1.0",
+    "jest": "24.1.0",
+    "jest-junit": "6.2.1",
+    "lerna": "3.11.0",
+    "prettier": "1.16.4"
   },
   "jest": {
     "coverageThreshold": {
@@ -24,9 +24,9 @@
   "private": true,
   "scripts": {
     "build": "lerna run build --stream --reject-cycles",
-    "eslint": "eslint . --max-warnings 0",
+    "eslint": "eslint --ignore-path .gitignore --ignore-pattern !.eslintrc.js --max-warnings 0 .",
     "prepublish": "yarn run build",
-    "prettier": "prettier \"**/*.{js,json,md}\"",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.{js,json,md,yml}\"",
     "test": "jest"
   },
   "workspaces": ["packages/*"]

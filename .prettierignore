@@ -1,5 +1,0 @@
-/coverage/
-/packages/browser-based-pdf-export-lambda/dist/
-
-# Lerna will change the formatting when incrementing the version so we ignore them.
-package.json

@@ -1,7 +1,0 @@
-# Lint .eslintrc.js file
-!.*.js
-
-/coverage/
-/packages/browser-based-pdf-export-lambda/dist/
-
-node_modules/

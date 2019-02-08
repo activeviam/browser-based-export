@@ -5,17 +5,17 @@
   },
   "dependencies": {
     "body-parser": "1.18.3",
-    "browser-based-export": "^0.1.8",
-    "envalid": "4.1.4",
-    "express": "4.16.3",
-    "express-winston": "2.5.1",
-    "lodash": "4.17.10",
-    "winston": "2.4.2",
-    "yargs": "11.0.0"
+    "browser-based-export": "0.2.0",
+    "envalid": "4.2.1",
+    "express": "4.16.4",
+    "express-winston": "3.1.0",
+    "lodash": "4.17.11",
+    "winston": "3.2.1",
+    "yargs": "12.0.5"
   },
   "description": "Node.js server exposing an API to export a web application at a given URL to a PDF file",
   "devDependencies": {
-    "request": "2.87.0",
+    "request": "2.88.0",
     "request-promise-native": "1.0.5"
   },
   "engines": {
@@ -41,5 +41,5 @@
   "scripts": {
     "start": "node start"
   },
-  "version": "0.1.8"
+  "version": "0.2.0"
 }

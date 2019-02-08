@@ -191,7 +191,7 @@ describe('authentication', () => {
 });
 
 describe('waiting before triggering the export', () => {
-  const responseText = 'control-text';
+  const responseText = 'controlText';
 
   // An order of magnitude should be enough to measure the timing with an acceptable accuracy.
   const getMillisecondsDelayFromControlExperiment = controlExperimentDuration =>

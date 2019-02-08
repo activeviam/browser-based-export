@@ -1,9 +1,14 @@
 'use strict';
 
+const path = require('path');
+
 const globalDebug = require('debug');
 const pTimeout = require('p-timeout');
 const promiseRetry = require('promise-retry');
-const puppeteer = require('puppeteer/lib/Puppeteer');
+const Puppeteer = require('puppeteer/lib/Puppeteer');
+const {
+  puppeteer: {chromium_revision: chromiumRevision},
+} = require('puppeteer/package');
 
 const {name: packageName} = require('../package');
 
@@ -78,7 +83,18 @@ const inBrowser = async ({
   const debug = namespacedDebug('inBrowser');
 
   const browser = await executeAsyncAction({
-    action: () => puppeteer.launch(puppeteerOptions),
+    action: () => {
+      const puppeteerRoot = path.dirname(
+        require.resolve('puppeteer/package.json')
+      );
+      const isPuppeteerCore = false;
+      const puppeteer = new Puppeteer(
+        puppeteerRoot,
+        chromiumRevision,
+        isPuppeteerCore
+      );
+      return puppeteer.launch(puppeteerOptions);
+    },
     debug,
     name: 'launching browser',
   });
@@ -155,6 +171,7 @@ const waitForEvaluationContext = ({page, timeoutInMilliseconds}) => {
 };
 
 module.exports = {
+  chromiumRevision,
   executeAsyncAction,
   inBrowser,
   namespacedDebug,

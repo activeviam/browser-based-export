@@ -3,14 +3,12 @@
 const Ajv = require('ajv');
 const dedent = require('dedent');
 const escapeQuote = require('js-string-escape');
-const {
-  puppeteer: {chromium_revision: chromiumRevision},
-} = require('puppeteer/package');
 
 const {getRoundedDimensionsInPx} = require('./paper');
 const {pdfExportExamplePayload} = require('./examples');
 const {pdfExportPayloadSchema} = require('./schemas');
 const {
+  chromiumRevision,
   executeAsyncAction,
   inBrowser: inAgnosticBrowser,
   namespacedDebug,
@@ -197,7 +195,7 @@ const waitForIdleBrowser = ({page}) =>
           window.${waitedForIdleCallbackFlag} = true;
         });
       }
-  
+
       return window.${waitedForIdleCallbackFlag};
     })()`
       ),

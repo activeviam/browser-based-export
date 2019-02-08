@@ -20,12 +20,12 @@ const outputDirectoryPath = path.join(packageDirectoryPath, outputDirectory);
 
 assert.equal(
   chromiumRevision,
-  '557152',
+  '624492',
   'The Chromium revision used by default by Puppeteer has changed. Please update the .zip URL below accordingly.'
 );
 
 const zipUrl =
-  'https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-44/dev-headless-chromium-amazonlinux-2017-03.zip';
+  'https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-55/dev-headless-chromium-amazonlinux-2017-03.zip';
 
 const download = async () => {
   const alreadyDownloaded = await fs.pathExists(
