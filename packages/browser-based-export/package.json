@@ -14,7 +14,7 @@
   "description": "Wrapper on top of Puppeteer's export to PDF feature",
   "devDependencies": {
     "cookie-parser": "1.4.3",
-    "express": "4.16.3",
+    "express": "4.17.3",
     "p-time": "1.0.0",
     "pdf-text": "0.4.0"
   },
